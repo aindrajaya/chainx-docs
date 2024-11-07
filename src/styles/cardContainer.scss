@@ -8,6 +8,29 @@
   position: relative;
   width: 100%;
 
+  /* Responsive adjustments */
+  @media (max-width: 1280px) { 
+    padding-inline: 8rem; 
+  }
+
+  @media (max-width: 1024px) {
+    padding-inline: 4rem; 
+  }
+
+  @media (max-width: 768px) { 
+    padding-inline: 2rem; 
+  }
+
+  @media (max-width: 640px) { 
+    padding-block: 2rem; 
+    padding-inline: 1rem; 
+  }
+
+  @media (max-width: 480px) {  // For smaller mobile phones
+    padding-block: 1.5rem;  // Reduce vertical padding further
+    padding-inline: 0.5rem;  // Reduce horizontal padding further 
+  }
+
   &__small {
     &:before {
       right: -6px;
