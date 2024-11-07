@@ -1,0 +1,125 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "ChainX Scanner API",
+      "version": "v1"
+    },
+    "servers": [
+        {
+          "url": "http://api.chainx.id/v1"
+        }
+      ],
+    "paths": {
+      "/": {
+        "get": {
+          "summary": "Get API Information",
+          "description": "Returns a simple message indicating the API is running and has a rate limiter.",
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "text/plain": {
+                  "schema": {
+                    "type": "string",
+                    "example": "Hello this is API From ChainX Scanner use Router, we have use rate limiter"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/scan": {
+        "post": {
+          "summary": "Scan Smart Contract",
+          "description": "Uploads and scans a smart contract file for vulnerabilities.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "multipart/form-data": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "format": "binary",
+                      "description": "The smart contract file to be uploaded."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Scan successful.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": {
+                        "type": "string",
+                        "example": "Smart contract scanned successfully"
+                      },
+                      "file": {
+                        "type": "string",
+                        "description": "Path to the uploaded file."
+                      },
+                      "vulnerabilitiesCount": {
+                        "type": "integer",
+                        "description": "Number of vulnerabilities found."
+                      },
+                      "dataVulnerabilities": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "vulnerabilityId": {
+                              "type": "integer",
+                              "description": "ID of the vulnerability."
+                            }
+                          }
+                        }
+                      },
+                      "message": {
+                        "type": "string",
+                        "description": "Message about the rate limiter."
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "No file uploaded.",
+              "content": {
+                "text/plain": {
+                  "schema": {
+                    "type": "string",
+                    "example": "No file uploaded."
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Database connection failed or an error occurred during the scan.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "An error occurred during the scan."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
