@@ -1,0 +1,69 @@
+---
+title: Overview
+description: Cortex Overview.
+slug: /
+---
+
+import OAICoverage from "@site/src/components/OAICoverage"
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# ChainX Scanner API
+
+:::info
+**Real-world Use:**  This API can be integrated into development tools, CI/CD pipelines, or security analysis platforms to automate the process of identifying vulnerabilities in Solidity smart contracts. 
+
+This API is currently under development. If you have any questions, please contact [arista.indrajaya@gmail.com](mailto:arista.indrajaya@gmail.com).
+:::
+
+ChainX Scanner API is a service that allows developers to scan their Solidity smart contracts for potential vulnerabilities.
+
+**Key Features:**
+
+*   **Automated Vulnerability Detection:**  Upload your smart contract and the API will automatically identify potential security risks.
+*   **Fast and Efficient:** The API is designed to provide quick and efficient scanning, minimizing delays in your development process.
+*   **Easy Integration:**  Integrate the API into your existing workflows using simple HTTP requests.
+*   **Rate Limiting:**  Includes rate limiting to prevent abuse and ensure fair usage.
+
+## How to Use
+
+1.  **Make a POST request to the `/scan` endpoint.**
+2.  **Include the smart contract file in the request body as `multipart/form-data`.**
+
+**Example using `curl`:**
+
+```bash
+curl -X POST \
+  -F 'file=@path/to/your/contract.sol' \
+  http://localhost:3000/scan  # Replace with your actual API URL
+
+
+## API Endpoints
+  - /scan (POST)
+    Description: Uploads and scans a smart contract file for vulnerabilities.
+    Request:
+    - file: The smart contract file (.sol) to be uploaded.
+    Response:
+    - 200 OK:
+      ```JSON
+      {
+        "success": "Smart contract scanned successfully",
+        "file": "/path/to/uploaded/file.sol",
+        "vulnerabilitiesCount": 2,
+        "dataVulnerabilities": [
+          { "vulnerabilityId": 1 },
+          { "vulnerabilityId": 2 }
+        ],
+        "message": "This API has Rate limiter, if you want to use more further please contact me at email: arista.indrajaya@gmail.com"
+      }
+      ```
+    - 400 Bad Request: Returned if no file is uploaded.
+    - 500 Internal Server Error: Returned if an error occurs during the scan.
+
+## Rate Limiting
+The API has a rate limiter in place to prevent abuse. If you exceed the rate limit, you will receive an error message.  For more usage, please contact arista.indrajaya@gmail.com.
+
+## Future Enhancements
+  - Detailed Vulnerability Reports: Provide more detailed information about each vulnerability, including its severity, description, and potential mitigation strategies.
+  - Support for Additional File Types: Expand support to include other smart contract file types beyond Solidity (e.g., Vyper).
+  - Integration with Development Tools: Develop plugins or integrations for popular development tools to streamline vulnerability scanning within common workflows.
