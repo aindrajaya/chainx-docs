@@ -6,7 +6,7 @@
     },
     "servers": [
         {
-          "url": "http://api.chainx.id/v1"
+          "url": "https://api.chainx.id/v1"
         }
       ],
     "paths": {
