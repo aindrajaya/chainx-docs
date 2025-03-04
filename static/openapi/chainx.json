@@ -5,10 +5,10 @@
       "version": "v1"
     },
     "servers": [
-        {
-          "url": "https://api.chainx.id/v1"
-        }
-      ],
+      {
+        "url": "https://chainx-api-dev-70e077384a6e.herokuapp.com"
+      }
+    ],
     "paths": {
       "/": {
         "get": {
@@ -29,10 +29,15 @@
           }
         }
       },
-      "/scan": {
+      "/api/v1/scan": {
         "post": {
           "summary": "Scan Smart Contract",
           "description": "Uploads and scans a smart contract file for vulnerabilities.",
+          "security": [
+            {
+              "ApiKeyAuth": []
+            }
+          ],
           "requestBody": {
             "required": true,
             "content": {
@@ -43,7 +48,7 @@
                     "file": {
                       "type": "string",
                       "format": "binary",
-                      "description": "The smart contract file to be uploaded."
+                      "description": "Smart contract file to scan (Solidity .sol file)"
                     }
                   }
                 }
@@ -52,7 +57,7 @@
           },
           "responses": {
             "200": {
-              "description": "Scan successful.",
+              "description": "Scan successful",
               "content": {
                 "application/json": {
                   "schema": {
@@ -64,11 +69,11 @@
                       },
                       "file": {
                         "type": "string",
-                        "description": "Path to the uploaded file."
+                        "example": "/uploads/contract_123.sol"
                       },
                       "vulnerabilitiesCount": {
                         "type": "integer",
-                        "description": "Number of vulnerabilities found."
+                        "example": 3
                       },
                       "dataVulnerabilities": {
                         "type": "array",
@@ -77,14 +82,22 @@
                           "properties": {
                             "vulnerabilityId": {
                               "type": "integer",
-                              "description": "ID of the vulnerability."
+                              "example": 101
+                            },
+                            "severity": {
+                              "type": "string",
+                              "example": "High"
+                            },
+                            "description": {
+                              "type": "string",
+                              "example": "Reentrancy vulnerability detected"
                             }
                           }
                         }
                       },
                       "message": {
                         "type": "string",
-                        "description": "Message about the rate limiter."
+                        "example": "Rate limit: 10 requests remaining"
                       }
                     }
                   }
@@ -92,18 +105,7 @@
               }
             },
             "400": {
-              "description": "No file uploaded.",
-              "content": {
-                "text/plain": {
-                  "schema": {
-                    "type": "string",
-                    "example": "No file uploaded."
-                  }
-                }
-              }
-            },
-            "500": {
-              "description": "Database connection failed or an error occurred during the scan.",
+              "description": "Bad request",
               "content": {
                 "application/json": {
                   "schema": {
@@ -111,7 +113,267 @@
                     "properties": {
                       "error": {
                         "type": "string",
-                        "example": "An error occurred during the scan."
+                        "example": "No file uploaded or invalid file type"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "429": {
+              "description": "Rate limit exceeded",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "API rate limit exceeded"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "Internal server error during scanning"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/v1/ai-scan": {
+        "post": {
+          "summary": "AI-Powered Smart Contract Scan",
+          "description": "Uploads a Solidity smart contract, analyzes it using an AI model via OpenRouter, and returns a report in both Markdown and PDF formats.",
+          "security": [
+            {
+              "ApiKeyAuth": []
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "multipart/form-data": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "file": {
+                      "type": "string",
+                      "format": "binary",
+                      "description": "Solidity smart contract file (.sol) to be analyzed."
+                    },
+                    "openrouterApiKey": {
+                      "type": "string",
+                      "description": "API key for accessing OpenRouter."
+                    },
+                    "model": {
+                      "type": "string",
+                      "description": "The AI model to use for analysis (e.g., 'google/gemini-2.0-pro-exp-02-05:free')."
+                    }
+                  },
+                  "required": [
+                    "file",
+                    "openrouterApiKey",
+                    "model"
+                  ]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+                "description": "Scan successful. Returns analysis results.",
+                "content": {
+                    "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                        "success": {
+                            "type": "boolean",
+                            "example": true
+                        },
+                        "message": {
+                            "type": "string",
+                            "example": "Analysis completed successfully."
+                        },
+                        "timeTaken": {
+                            "type": "string",
+                            "example": "12873.76 milliseconds"
+                        },
+                        "results": {
+                            "type": "object",
+                            "description": "Detailed analysis results.",
+                            "properties": {
+                            "<contract_filename>": {
+                                "type": "object",
+                                "description": "Analysis results for a specific contract file.",
+                                "properties": {
+                                "metadata": {
+                                    "type": "object",
+                                    "properties": {
+                                    "model": {
+                                        "type": "string",
+                                        "example": "google/gemini-2.0-pro-exp-02-05:free"
+                                    },
+                                    "timestamp": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2025-03-04T03:42:57.890Z"
+                                    }
+                                    }
+                                },
+                                "contracts": {
+                                    "type": "object",
+                                    "description": "Analysis results for individual contracts within the file.",
+                                    "properties": {
+                                    "<contract_name>": {
+                                        "type": "object",
+                                        "properties": {
+                                        "contractName": {
+                                            "type": "string",
+                                            "example": "CrowdFundBad"
+                                        },
+                                        "analysis": {
+                                            "type": "array",
+                                            "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "contractName": {
+                                                "type": "string",
+                                                "example": "CrowdFundBad"
+                                                },
+                                                "issues": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                    "type": {
+                                                        "type": "string",
+                                                        "example": "Denial of Service (DoS)"
+                                                    },
+                                                    "severity": {
+                                                        "type": "string",
+                                                        "example": "High"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "The `refundDos` function is vulnerable to a DoS attack..."
+                                                    },
+                                                    "recommendation": {
+                                                        "type": "string",
+                                                        "example": "Use a pull-over-push pattern for refunds..."
+                                                    }
+                                                    }
+                                                }
+                                                },
+                                                "recommendations": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string",
+                                                    "example": "Implement a pull-over-push pattern for payments..."
+                                                }
+                                                }
+                                            }
+                                            }
+                                        },
+                                        "analyzedAt": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-03-04T03:42:57.890Z"
+                                            }
+                                        }
+                                    }
+                                    }
+                                }
+                                }
+                            }
+                            }
+                        },
+                            "outputFile": {
+                            "type": "string",
+                                "example": "analysis_results_2025-03-04T03-42-57-890Z.md"
+                        }
+                        }
+                    }
+                    }
+                }
+            },
+            "400": {
+              "description": "Bad Request.  Indicates missing or invalid request parameters.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "Missing openrouterApiKey"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+             "401": {
+              "description": "Unauthorized. Indicates an invalid or missing API key.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "Unauthorized: Invalid or missing API key"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "429": {
+              "description": "Too Many Requests.  Indicates that the rate limit has been exceeded (not implemented in the current code).",
+              "content": {
+                "application/json": {
+                  "schema": {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "string",
+                           "example": "API rate limit exceeded"
+                        }
+                      }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal Server Error.  Indicates an error during processing.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "Internal server error"
+                      },
+                      "message":{
+                        "type": "string",
+                        "example": "Error detail message."
                       }
                     }
                   }
@@ -121,5 +383,16 @@
           }
         }
       }
+    },
+    "components": {
+      "securitySchemes": {
+        "ApiKeyAuth": {
+          "type": "apiKey",
+          "in": "header",
+          "name": "X-API-Key",
+          "description": "API key for authentication"
+        }
+      }
     }
   }
+  
