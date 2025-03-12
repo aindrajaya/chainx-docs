@@ -1,0 +1,28 @@
+# platform
+.DS_Store
+platform/cortex.db
+dist
+*.lock
+node_modules
+.turbo
+package-lock.json
+
+# CI - Test - Coverage
+cortex.log
+api.log
+prism.log
+api.json
+openai-python/*
+build
+platform/cortex.exe
+platform/package-lock.json
+.vscode
+platform/command
+platform/src/infrastructure/commanders/test/test_data
+**/vcpkg_installed
+engine/test.db
+!docs/yarn.lock
+
+README.md
+README (2).md
+.docusaurus
