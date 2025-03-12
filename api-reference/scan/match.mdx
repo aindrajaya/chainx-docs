@@ -1,0 +1,62 @@
+---
+title: Match Information API
+openapi: 'GET /api/match-info/{matchId}'
+---
+
+# Match Information API
+
+The Match Information API provides data regarding football matches, focusing on teams, scores, and outcomes.
+
+## Endpoint
+
+`GET /api/match-info/{matchId}`
+
+### Response Format
+
+- **200 OK**: If successful, it returns match information in JSON format.
+
+### Example Response
+
+```json
+{
+  "A": {
+    "BL": false,
+    "I": "5ab4b527494765f3ca4c6fd8",
+    "IM": "/sfiles/logo_teams/4582.png",
+    "M": "4582.png",
+    "P": false,
+    "S": [
+      {
+        "IM": "/sfiles/logo_teams/4582.png",
+        "M": "4582.png",
+        "T": "Спартак Трнава"
+      }
+    ],
+    "SI": 1,
+    "T": "Спартак Трнава",
+    "TP": 1,
+    "XI": 4582
+  },
+  "H": {
+    "BL": false,
+    "I": "5ab227d6494765f3ca2f9f27",
+    "IM": "/sfiles/logo_teams/8b60e61ca43fe72b920ec131deaf3f76.png",
+    "M": "8b60e61ca43fe72b920ec131deaf3f76.png",
+    "P": false,
+    "S": [
+      {
+        "IM": "/sfiles/logo_teams/8b60e61ca43fe72b920ec131deaf3f76.png",
+        "M": "8b60e61ca43fe72b920ec131deaf3f76.png",
+        "T": "Градец-Кралове"
+      }
+    ],
+    "SI": 1,
+    "T": "Градец-Кралове",
+    "TP": 1,
+    "XI": 5472
+  },
+  "S1": 2,
+  "S2": 1,
+  "St": 3,
+  "W": 1
+}

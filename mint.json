@@ -1,0 +1,80 @@
+{
+  "$schema": "https://raw.githubusercontent.com/aindrajaya/chainx-docs/refs/heads/main/static/openapi/chainx.json",
+  "name": "Chainx Docs",
+  "logo": {
+    "dark": "/logo/main-logo.svg",
+    "light": "/logo/main-logo-light.svg"
+  },
+  "favicon": "/favicon.png",
+  "colors": {
+    "primary": "#0D9373",
+    "light": "#07C983",
+    "dark": "#0D9373",
+    "anchors": {
+      "from": "#0D9373",
+      "to": "#07C983"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "Support",
+      "url": "mailto:dev@mchainx.id"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Chainx Dashboard",
+    "url": "https://www.chainx.id/dashboard/init"
+  },
+  "tabs": [
+    {
+      "name": "API Reference",
+      "url": "api-reference"
+    }
+  ],
+  "anchors": [
+    {
+      "name": "Chainx App",
+      "icon": "book-open-cover",
+      "url": "https://chainx.id/"
+    }
+  ],
+  "navigation": [
+    {
+      "group": "Get Started",
+      "pages": [
+        "introduction",
+        "quickstart",
+        "use-case"
+      ]
+    },
+    {
+      "group": "API Documentation",
+      "pages": [
+        "api-reference/introduction"
+      ]
+    },
+    {
+      "group": "Info Scan",
+      "pages": [
+        "api-reference/info/get"
+      ]
+    },
+    {
+      "group": "Static Scan",
+      "pages": [
+        "api-reference/scan/create"
+      ]
+    },
+    {
+      "group": "AI Scan",
+      "pages": [
+        "api-reference/ai-scan/create"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "x": "https://x.com/chainx-scanner",
+    "github": "https://github.com/aindrajaya",
+    "linkedin": "https://linkedin.com/company/chainx"
+  }
+}

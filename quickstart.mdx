@@ -1,0 +1,87 @@
+---
+title: Quickstart
+description: Get started with the ChainX Smart Contract Scanner API in minutes
+---
+
+## Setting up your environment
+
+Before you can start scanning smart contracts, you need to set up your local development environment.
+
+### Install Node.js and npm
+
+Make sure you have Node.js (version 12 or later) and npm installed on your system. You can download them from the official Node.js website: [https://nodejs.org/](https://nodejs.org/)
+
+### Clone the repository
+
+Clone the ChainX API repository from GitHub:
+
+```bash
+git clone https://github.com/aindrajaya/chainx-api.git
+```
+
+### Install dependencies
+
+Navigate to the project directory and install the required dependencies:
+
+```bash
+cd chainx-api
+npm install
+```
+
+### Start the server
+
+Start the API server:
+
+```bash
+npm start
+```
+
+The server will run on `http://localhost:3000` by default.
+
+## Scan your first smart contract
+
+Now that your environment is set up, you can scan your first smart contract.
+
+### Generate an API key
+
+First, generate an API key using the following cURL command:
+
+```bash
+curl -X POST https://your-api-domain.com/api/generate-api-key \
+  -H "Content-Type: application/json" \
+  -d '{"type": "production"}'
+```
+
+Replace `"production"` with `"test"` if you want a test API key.
+
+The response will contain your API key:
+
+```json
+{
+  "apiKey": "your-api-key-here"
+}
+```
+
+### Scan a smart contract
+
+Use the `/api/v1/scan` endpoint to scan your smart contract. You'll need to include your API key in the request header.
+
+Here's an example cURL command:
+
+```bash
+curl -X POST https://your-api-domain.com/api/v1/scan \
+  -H "X-API-Key: your-api-key-here" \
+  -F "file=@/path/to/your/smart-contract.sol"
+```
+
+Replace `your-api-key-here` with your actual API key and `/path/to/your/smart-contract.sol` with the path to your Solidity file.
+
+### View the results
+
+The API will respond with a JSON object containing the scan results, including the number of vulnerabilities found and details about each vulnerability.
+
+## Next steps
+
+Now that you've scanned your first smart contract, you can explore the other features of the ChainX API, such as AI-powered scanning and security best practices.
+
+Refer to the full documentation for more information: [https://docs.chainx.id](https://docs.chainx.id)
