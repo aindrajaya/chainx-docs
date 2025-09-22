@@ -1,0 +1,215 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+/* --- base.css --- */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Space+Grotesk:wght@300..700&display=swap");
+:root {
+  --ifm-color-primary: #2563eb;
+  --ifm-color-primary-dark: #2159d4;
+  --ifm-color-primary-darker: #1e4fbc;
+  --ifm-color-primary-darkest: #1a45a5;
+  --ifm-color-primary-light: #3b73ed;
+  --ifm-color-primary-lighter: #5182ef;
+  --ifm-color-primary-lightest: #6692f1;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  /* Custom */
+  --ifm-navbar-background-color: #fff;
+  --ifm-background-color: #fff;
+  --ifm-toc-border-color: transparent;
+  --ifm-font-family-base: "Inter";
+}
+html[data-theme="dark"] {
+  --ifm-color-primary: #4377e9;
+  --ifm-color-primary-dark: #3c6bd2;
+  --ifm-color-primary-darker: #365fba;
+  --ifm-color-primary-darkest: #2f53a3;
+  --ifm-color-primary-light: #5685eb;
+  --ifm-color-primary-lighter: #6992ed;
+  --ifm-color-primary-lightest: #7ba0f0;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  /* Custom */
+  --ifm-navbar-background-color: #111;
+  --ifm-background-color: #111;
+  --ifm-toc-border-color: transparent;
+  --ifm-font-family-base: "Inter";
+}
+.openai-coverage p {
+  margin-bottom: 0;
+}
+.plugin-docs main {
+  padding: 80px 0;
+}
+.sidebar-heading-type {
+  color: var(--method-color) !important;
+}
+
+/* --- alert.css --- */
+.alert {
+  border-left: 0;
+}
+
+/* --- apiReference.css --- */
+.sidebar-heading-link-title {
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
+  font-weight: 400 !important;
+}
+.sidebar-group-title {
+  font-weight: 600 !important;
+  border-top: none !important;
+  font-size: 14px !important;
+  padding-left: 12px !important;
+}
+
+/* --- cardContainer.css --- */
+.cardContainer {
+  border-top: 1px solid;
+  padding-block: 3rem;
+  padding-inline: 12rem;
+  position: relative;
+  width: 100%;
+  /* Responsive adjustments */
+  /* You can add media queries here as needed */
+}
+.cardCustom .card {
+  overflow: visible;
+  border: 1px solid;
+  padding: 32px;
+  border-radius: 16px;
+  position: relative;
+}
+
+/* --- codehike.css --- */
+.ch-codeblock {
+  box-shadow: none !important;
+}
+.ch-codeblock .ch-code-button {
+  display: none;
+}
+.ch-codeblock:hover .ch-code-button {
+  display: block;
+}
+
+/* --- footer.css --- */
+:root footer {
+  --ifm-footer-background-color: #fff;
+}
+html[data-theme="dark"] footer {
+  --ifm-footer-background-color: #111;
+}
+footer {
+  margin: 0px;
+  padding: 0px;
+}
+[data-theme="light"] .DocSearch {
+  --docsearch-searchbox-background: white;
+}
+.DocSearch-Footer {
+  margin: 0;
+}
+.DocSearch-Button-Key,
+.DocSearch-Commands-Key {
+  box-shadow: none !important;
+}
+.DocSearch-Button {
+  border-radius: 8px !important;
+  padding: 0 10px !important;
+  border: 1px solid rgb(216, 216, 216) !important;
+}
+.DocSearch-Search-Icon {
+  width: 14px !important;
+}
+.DocSearch-Button-Key {
+  color: black !important;
+}
+[data-theme="dark"] .DocSearch-Button {
+  border: 1px solid rgb(66, 66, 66) !important;
+}
+
+/* --- models-detail.css --- */
+.models-detail hr {
+  display: none;
+}
+.models-detail li {
+  margin-top: 8px;
+}
+.models-detail pre {
+  margin-top: 8px;
+}
+
+/* --- navbar.css --- */
+.navbar {
+  box-shadow: none;
+  border-bottom: 1px solid;
+}
+.header-github-link::before {
+  content: "";
+  width: 21px;
+  height: 21px;
+  display: flex;
+  background-color: var(--ifm-navbar-link-color);
+  /* mask-image omitted for brevity */
+  transition: background-color var(--ifm-transition-fast) var(--ifm-transition-timing-default);
+}
+.header-discord-link::before {
+  content: "";
+  width: 24px;
+  height: 24px;
+  display: flex;
+  background-color: var(--ifm-navbar-link-color);
+  /* mask-image omitted for brevity */
+  transition: background-color var(--ifm-transition-fast) var(--ifm-transition-timing-default);
+}
+
+/* --- pagination.css --- */
+.pagination-nav {
+  padding-top: 24px;
+  border-top: 1px solid;
+}
+.pagination-nav__link {
+  border: none;
+}
+
+/* --- sidebar.css --- */
+.sidebar-divider {
+  padding-left: 10px;
+  margin-top: 32px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #222;
+}
+.menu__caret:before {
+  background: var(--ifm-menu-link-sublist-icon) 50% / 1.4rem 2rem;
+}
+.sidebar-search-shortcut .sidebar-search-key {
+  box-shadow: none !important;
+}
+.menu__link {
+  color: #555;
+  font-weight: 400;
+  font-size: 0.875rem;
+}
+.menu__link--active {
+  color: var(--ifm-menu-color-active);
+  font-weight: 600;
+}
+.menu__list-item {
+  margin-top: 0 !important;
+}
+.plugin-id-changelog .menu,
+.plugin-id-changelog .theme-doc-toc-desktop {
+  display: none;
+}
+
+/* --- tabs.css --- */
+.tabs {
+  border-bottom: 1px solid;
+}
+.tabs__item {
+  padding: 6px;
+  margin: 0 8px;
+}

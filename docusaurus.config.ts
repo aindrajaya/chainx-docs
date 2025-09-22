@@ -80,6 +80,8 @@ const config: Config = {
       };
     },
 
+    // Temporarily disabled due to Hugging Face rate limiting
+    /*
     async function modelsPagesGenPlugin(context, options) {
       return {
         name: "list-models",
@@ -87,9 +89,10 @@ const config: Config = {
           const { setGlobalData } = actions;
           try {
             let fetchedModels = [];
-            for await (const model of listModels({
-              search: { owner: "cortexso" },
-            })) {
+            try {
+              for await (const model of listModels({
+                search: { owner: "cortexso" },
+              })) {
               try {
                 const files = [];
                 let readmeContent = "README.md not available";
@@ -99,21 +102,29 @@ const config: Config = {
                 })) {
                   files.push(fileInfo);
                   if (fileInfo.path === "README.md") {
-                    const response = await downloadFile({
-                      repo: model.name,
-                      path: "README.md",
-                    });
-                    if (response && response.text) {
-                      readmeContent = await response.text();
+                    try {
+                      const response = await downloadFile({
+                        repo: model.name,
+                        path: "README.md",
+                      });
+                      if (response && response.text) {
+                        readmeContent = await response.text();
+                      }
+                    } catch (error) {
+                      console.warn(`Error fetching README for ${model.name}:`, error.message);
                     }
                   }
                   if (fileInfo.path === "model.yml") {
-                    const response = await downloadFile({
-                      repo: model.name,
-                      path: "model.yml",
-                    });
-                    if (response && response.text) {
-                      modelContent = await response.text();
+                    try {
+                      const response = await downloadFile({
+                        repo: model.name,
+                        path: "model.yml",
+                      });
+                      if (response && response.text) {
+                        modelContent = await response.text();
+                      }
+                    } catch (error) {
+                      console.warn(`Error fetching model.yml for ${model.name}:`, error.message);
                     }
                   }
                 }
@@ -131,10 +142,16 @@ const config: Config = {
                     ...refs,
                   });
                 } catch (error) {
-                  console.error("Error fetching refs");
+                  console.warn(`Error fetching refs for ${model.name}:`, error.message);
+                  fetchedModels.push({
+                    ...model,
+                    files,
+                    readmeContent,
+                    modelContent,
+                  });
                 }
               } catch (error) {
-                console.error("Error fetching files:", error);
+                console.warn(`Error fetching files for ${model.name}:`, error.message);
                 fetchedModels.push({
                   ...model,
                   files: [],
@@ -143,6 +160,11 @@ const config: Config = {
                   error: "Error fetching files",
                 });
               }
+            }
+            } catch (error) {
+              console.warn("Error fetching models from Hugging Face:", error.message);
+              // Set empty array if we can't fetch models
+              setGlobalData([]);
             }
             setGlobalData(fetchedModels);
             await Promise.all(
@@ -172,7 +194,10 @@ const config: Config = {
         },
       };
     },
+    */
 
+    // Temporarily disabled to debug server startup
+    /*
     async function getChangelogList(context, options) {
       return {
         name: "changelog-list",
@@ -207,7 +232,10 @@ const config: Config = {
         },
       };
     },
+    */
 
+    // Temporarily disabled to debug server startup
+    /*
     async function getRepoInfo(context, options) {
       return {
         name: "repo-info",
@@ -267,6 +295,7 @@ const config: Config = {
         },
       };
     },
+    */
     [
       "./src/plugins/scalar/index.ts",
       {
@@ -350,7 +379,7 @@ const config: Config = {
         theme: {
           customCss: [
             require.resolve("@code-hike/mdx/styles.css"),
-            "./src/styles/main.scss",
+            "./src/styles/main.css",
           ],
         },
       } satisfies Preset.Options,
