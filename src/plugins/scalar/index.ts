@@ -1,12 +1,14 @@
 import type { LoadContext, Plugin } from "@docusaurus/types";
-import type { ReferenceProps } from "@scalar/api-reference-react";
 import path from "path";
+
+export type ScalarConfiguration = Record<string, unknown>;
 
 export type ScalarOptions = {
   label: string;
   route: string;
   showNavLink?: boolean;
-} & ReferenceProps;
+  configuration?: ScalarConfiguration;
+};
 
 /**
  * Used to set default options from the user-provided options
@@ -23,7 +25,7 @@ const createDefaultScalarOptions = (options: ScalarOptions): ScalarOptions => ({
 function ScalarDocusaurusCustomPlugin(
   context: LoadContext,
   options: ScalarOptions
-): Plugin<ReferenceProps> {
+): Plugin<ScalarOptions> {
   const defaultOptions = createDefaultScalarOptions(options);
 
   return {

@@ -9,18 +9,29 @@ type ChangelogHeaderProps = {
 const ChangelogHeader = (props: ChangelogHeaderProps) => {
   const { slug } = props;
 
-  const data = usePluginData("changelog-list") as any[];
+  const data = usePluginData("changelog-list") as
+    | { frontmatter: Record<string, any> }[]
+    | undefined;
 
-  const currentChangelog = data.filter((x) => x.frontmatter.slug === slug)[0];
+  const currentChangelog = data?.find(
+    (entry) => entry?.frontmatter?.slug === slug
+  );
+
+  if (!currentChangelog) {
+    return null;
+  }
+
+  const formattedDate =
+    currentChangelog.frontmatter?.date &&
+    format(String(currentChangelog.frontmatter.date), "MMMM do, yyyy");
 
   return (
     <div className="!-mt-2">
       <p className="mb-2 text-black/60 dark:text-white/60">
-        {format(String(currentChangelog.frontmatter.date), "MMMM do, yyyy") ||
-          null}
+        {formattedDate || null}
       </p>
 
-      {currentChangelog.frontmatter.ogImage && (
+      {currentChangelog.frontmatter?.ogImage && (
         <img
           src={currentChangelog.frontmatter.ogImage}
           alt={currentChangelog.frontmatter.title}

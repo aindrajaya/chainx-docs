@@ -18,7 +18,7 @@ import CopyCommand from "@site/src/components/CopyCommand";
 import { yamlToJSON } from "@site/src/utils";
 
 const ModelsPage = () => {
-  const listModels = usePluginData("list-models");
+  const listModels = usePluginData("list-models") as any[] | undefined;
   const [searchValue, setSearchValue] = useState("");
   const [checkedItems, setCheckedItems] = useState([]);
   const [tabActive, setTabActive] = useState("hgf");
@@ -33,12 +33,19 @@ const ModelsPage = () => {
     filters: string[]
   ) => {
     return models.filter((model) => {
+      if (!model || typeof model !== "object") {
+        return false;
+      }
+
       if (!model.name.toLowerCase().includes(search.toLowerCase())) {
         return false;
       }
 
       if (filters.length > 0) {
-        return model.branches.some((branch: { name: string }) =>
+        const branches: { name: string }[] = Array.isArray(model.branches)
+          ? model.branches
+          : [];
+        return branches.some((branch) =>
           filters.some((filter) =>
             branch.name.toLowerCase().includes(filter.toLowerCase())
           )
@@ -49,8 +56,10 @@ const ModelsPage = () => {
     });
   };
 
+  const safeModels = Array.isArray(listModels) ? listModels : [];
+
   const filteredModels = filterModelsByBranches(
-    listModels as any[],
+    safeModels,
     searchValue,
     checkedItems
   );
@@ -156,7 +165,12 @@ const ModelsPage = () => {
         <div className="w-full p-4 lg:p-8">
           <div className="w-full lg:w-3/4 mx-auto px-4">
             {(filteredModels as any[]).map((model, i) => {
-              const modelYaml = JSON.parse(yamlToJSON(model.modelContent));
+              let modelYaml: any = {};
+              try {
+                modelYaml = JSON.parse(yamlToJSON(model.modelContent));
+              } catch (error) {
+                return null;
+              }
               if (
                 modelYaml.engine === "openai" ||
                 modelYaml.engine === "anthropic" ||
