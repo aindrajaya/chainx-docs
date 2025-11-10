@@ -1,5 +1,6 @@
 import type { LoadContext, Plugin } from "@docusaurus/types";
 import type { ReferenceProps } from "@scalar/api-reference-react";
+import path from "path";
 
 export type ScalarOptions = {
   label: string;
@@ -50,7 +51,10 @@ function ScalarDocusaurusCustomPlugin(
 
       addRoute({
         path: defaultOptions.route,
-        component: "@scalar/docusaurus/dist/ScalarDocusaurus",
+        component: path.resolve(
+          __dirname,
+          "../../components/ScalarApiReference"
+        ),
         // Provide the path to the loaded spec as a prop to your component
         exact: true,
         ...content,

@@ -275,7 +275,7 @@ const config: Config = {
         route: "/api-reference",
         configuration: {
           spec: {
-            url: "/openapi/chainx.json",
+            url: "https://raw.githubusercontent.com/aindrajaya/chainx-docs/main/static/openapi/chainx.json",
           },
           hideModels: true,
         },
