@@ -29,10 +29,641 @@
           }
         }
       },
+      "/api/hello": {
+        "get": {
+          "summary": "Health Check",
+          "description": "Simple health check endpoint that returns a greeting message.",
+          "responses": {
+            "200": {
+              "description": "OK",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "Hello this is API From ChainX Scanner"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/register": {
+        "post": {
+          "summary": "User Registration",
+          "description": "Register a new user account. An OTP will be sent to the provided email for verification.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "string",
+                      "format": "email",
+                      "example": "user@example.com"
+                    },
+                    "password": {
+                      "type": "string",
+                      "format": "password",
+                      "example": "securePassword123"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "John Doe"
+                    }
+                  },
+                  "required": ["email", "password", "name"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "User registered successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "User registered successfully. Please verify your email."
+                      },
+                      "userId": {
+                        "type": "string",
+                        "example": "cluxyz123"
+                      },
+                      "verificationSent": {
+                        "type": "boolean",
+                        "example": true
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad request - missing required fields",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "Email, password, and name are required"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "Failed to register user"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/login": {
+        "post": {
+          "summary": "User Login",
+          "description": "Login with email and password. Email must be verified before login.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "string",
+                      "format": "email",
+                      "example": "user@example.com"
+                    },
+                    "password": {
+                      "type": "string",
+                      "format": "password",
+                      "example": "securePassword123"
+                    }
+                  },
+                  "required": ["email", "password"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Login successful",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "Login successful"
+                      },
+                      "userId": {
+                        "type": "string",
+                        "example": "cluxyz123"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Invalid credentials",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "Invalid credentials"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Email not verified",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "Please verify your email first"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/verify-email": {
+        "post": {
+          "summary": "Verify Email with OTP",
+          "description": "Verify user email using the OTP sent during registration.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "string",
+                      "format": "email",
+                      "example": "user@example.com"
+                    },
+                    "otp": {
+                      "type": "string",
+                      "example": "12345678"
+                    }
+                  },
+                  "required": ["email", "otp"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Email verified successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "message": {
+                        "type": "string",
+                        "example": "Email verified successfully"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid OTP or expired",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "Invalid OTP"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/resend-otp": {
+        "post": {
+          "summary": "Resend Email Verification OTP",
+          "description": "Resend OTP to the user's email address.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "string",
+                      "format": "email",
+                      "example": "user@example.com"
+                    }
+                  },
+                  "required": ["email"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "OTP sent successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "message": {
+                        "type": "string",
+                        "example": "OTP sent successfully"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad request",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "User not found"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/forgot-password": {
+        "post": {
+          "summary": "Initiate Password Reset",
+          "description": "Request a password reset. A reset link will be sent to the user's email.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "string",
+                      "format": "email",
+                      "example": "user@example.com"
+                    }
+                  },
+                  "required": ["email"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Reset email sent successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "message": {
+                        "type": "string",
+                        "example": "Reset email sent successfully"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad request",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "Email is required"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/reset-password": {
+        "post": {
+          "summary": "Reset Password with Token",
+          "description": "Complete the password reset process using the token sent via email.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "example": "abc123def456..."
+                    },
+                    "newPassword": {
+                      "type": "string",
+                      "format": "password",
+                      "example": "newSecurePassword123"
+                    }
+                  },
+                  "required": ["token", "newPassword"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Password reset successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "message": {
+                        "type": "string",
+                        "example": "Password reset successfully"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad request",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "Invalid or expired reset token"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/generate-api-key": {
+        "post": {
+          "summary": "Generate API Key",
+          "description": "Generate a new API key for accessing protected endpoints.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "userId": {
+                      "type": "string",
+                      "example": "cluxyz123"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": ["PRODUCTION", "TEST"],
+                      "example": "PRODUCTION"
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "My API Key"
+                    }
+                  },
+                  "required": ["userId", "type", "name"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "API key generated successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "API key generated successfully"
+                      },
+                      "apiKey": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "example": "key_123"
+                          },
+                          "keyValue": {
+                            "type": "string",
+                            "example": "prod-chainx-abc123..."
+                          },
+                          "type": {
+                            "type": "string",
+                            "example": "PRODUCTION"
+                          },
+                          "expiresAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Internal server error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "Internal server error"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/v1/user-api-keys": {
+        "get": {
+          "summary": "Get User API Keys",
+          "description": "Retrieve all API keys for the authenticated user.",
+          "parameters": [
+            {
+              "name": "userId",
+              "in": "query",
+              "schema": {
+                "type": "string"
+              },
+              "description": "User ID (can also be sent via User-ID header)"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "API keys retrieved successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "message": {
+                        "type": "string",
+                        "example": "API keys fetched successfully"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "apiKeys": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "keyValue": {
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "type": "string"
+                                },
+                                "expiresAt": {
+                                  "type": "string",
+                                  "format": "date-time"
+                                },
+                                "status": {
+                                  "type": "string",
+                                  "enum": ["ACTIVE", "EXPIRED"]
+                                }
+                              }
+                            }
+                          },
+                          "total": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad request",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "User ID is required"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "/api/v1/scan": {
         "post": {
           "summary": "Scan Smart Contract",
-          "description": "Uploads and scans a smart contract file for vulnerabilities.",
+          "description": "Uploads and scans a smart contract file for vulnerabilities. Requires valid API key authentication.",
           "security": [
             {
               "ApiKeyAuth": []
@@ -50,7 +681,8 @@
                       "format": "binary",
                       "description": "Smart contract file to scan (Solidity .sol file)"
                     }
-                  }
+                  },
+                  "required": ["file"]
                 }
               }
             }
@@ -64,8 +696,17 @@
                     "type": "object",
                     "properties": {
                       "success": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "message": {
                         "type": "string",
-                        "example": "Smart contract scanned successfully"
+                        "example": "File scanned successfully"
+                      },
+                      "scanId": {
+                        "type": "string",
+                        "example": "cluxyz123scan456",
+                        "description": "Unique identifier for this scan result"
                       },
                       "file": {
                         "type": "string",
@@ -81,23 +722,11 @@
                           "type": "object",
                           "properties": {
                             "vulnerabilityId": {
-                              "type": "integer",
-                              "example": 101
-                            },
-                            "severity": {
                               "type": "string",
-                              "example": "High"
-                            },
-                            "description": {
-                              "type": "string",
-                              "example": "Reentrancy vulnerability detected"
+                              "example": "SWC-103"
                             }
                           }
                         }
-                      },
-                      "message": {
-                        "type": "string",
-                        "example": "Rate limit: 10 requests remaining"
                       }
                     }
                   }
@@ -113,7 +742,39 @@
                     "properties": {
                       "error": {
                         "type": "string",
-                        "example": "No file uploaded or invalid file type"
+                        "example": "No file uploaded."
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized - API key required",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "API key is required. Please provide X-API-Key header."
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden - Invalid or expired API key",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "Invalid or expired API key"
                       }
                     }
                   }
@@ -145,7 +806,7 @@
                     "properties": {
                       "error": {
                         "type": "string",
-                        "example": "Internal server error during scanning"
+                        "example": "Internal server error"
                       }
                     }
                   }
@@ -158,7 +819,7 @@
       "/api/v1/ai-scan": {
         "post": {
           "summary": "AI-Powered Smart Contract Scan",
-          "description": "Uploads a Solidity smart contract, analyzes it using an AI model via OpenRouter, and returns a report in both Markdown and PDF formats.",
+          "description": "Uploads a Solidity smart contract, analyzes it using an AI model via OpenRouter, and returns a report in Markdown format. Requires valid API key authentication.",
           "security": [
             {
               "ApiKeyAuth": []
@@ -216,96 +877,11 @@
                         },
                         "results": {
                             "type": "object",
-                            "description": "Detailed analysis results.",
-                            "properties": {
-                            "<contract_filename>": {
-                                "type": "object",
-                                "description": "Analysis results for a specific contract file.",
-                                "properties": {
-                                "metadata": {
-                                    "type": "object",
-                                    "properties": {
-                                    "model": {
-                                        "type": "string",
-                                        "example": "google/gemini-2.0-pro-exp-02-05:free"
-                                    },
-                                    "timestamp": {
-                                        "type": "string",
-                                        "format": "date-time",
-                                        "example": "2025-03-04T03:42:57.890Z"
-                                    }
-                                    }
-                                },
-                                "contracts": {
-                                    "type": "object",
-                                    "description": "Analysis results for individual contracts within the file.",
-                                    "properties": {
-                                    "<contract_name>": {
-                                        "type": "object",
-                                        "properties": {
-                                        "contractName": {
-                                            "type": "string",
-                                            "example": "CrowdFundBad"
-                                        },
-                                        "analysis": {
-                                            "type": "array",
-                                            "items": {
-                                            "type": "object",
-                                            "properties": {
-                                                "contractName": {
-                                                "type": "string",
-                                                "example": "CrowdFundBad"
-                                                },
-                                                "issues": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                    "type": {
-                                                        "type": "string",
-                                                        "example": "Denial of Service (DoS)"
-                                                    },
-                                                    "severity": {
-                                                        "type": "string",
-                                                        "example": "High"
-                                                    },
-                                                    "description": {
-                                                        "type": "string",
-                                                        "example": "The `refundDos` function is vulnerable to a DoS attack..."
-                                                    },
-                                                    "recommendation": {
-                                                        "type": "string",
-                                                        "example": "Use a pull-over-push pattern for refunds..."
-                                                    }
-                                                    }
-                                                }
-                                                },
-                                                "recommendations": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "string",
-                                                    "example": "Implement a pull-over-push pattern for payments..."
-                                                }
-                                                }
-                                            }
-                                            }
-                                        },
-                                        "analyzedAt": {
-                                            "type": "string",
-                                            "format": "date-time",
-                                            "example": "2025-03-04T03:42:57.890Z"
-                                            }
-                                        }
-                                    }
-                                    }
-                                }
-                                }
-                            }
-                            }
+                            "description": "Detailed analysis results."
                         },
-                            "outputFile": {
+                        "outputFile": {
                             "type": "string",
-                                "example": "analysis_results_2025-03-04T03-42-57-890Z.md"
+                            "example": "analysis_results_2025-03-04T03-42-57-890Z.md"
                         }
                         }
                     }
@@ -313,7 +889,7 @@
                 }
             },
             "400": {
-              "description": "Bad Request.  Indicates missing or invalid request parameters.",
+              "description": "Bad Request. Indicates missing or invalid request parameters.",
               "content": {
                 "application/json": {
                   "schema": {
@@ -321,15 +897,15 @@
                     "properties": {
                       "error": {
                         "type": "string",
-                        "example": "Missing openrouterApiKey"
+                        "example": "File, API key, and model are required."
                       }
                     }
                   }
                 }
               }
             },
-             "401": {
-              "description": "Unauthorized. Indicates an invalid or missing API key.",
+            "401": {
+              "description": "Unauthorized - API key required or invalid",
               "content": {
                 "application/json": {
                   "schema": {
@@ -337,7 +913,23 @@
                     "properties": {
                       "error": {
                         "type": "string",
-                        "example": "Unauthorized: Invalid or missing API key"
+                        "example": "API key is required. Please provide X-API-Key header."
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden - Invalid or expired API key",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "error": {
+                        "type": "string",
+                        "example": "Invalid or expired API key"
                       }
                     }
                   }
@@ -345,7 +937,7 @@
               }
             },
             "429": {
-              "description": "Too Many Requests.  Indicates that the rate limit has been exceeded (not implemented in the current code).",
+              "description": "Too Many Requests. Indicates that the rate limit has been exceeded.",
               "content": {
                 "application/json": {
                   "schema": {
@@ -361,21 +953,60 @@
               }
             },
             "500": {
-              "description": "Internal Server Error.  Indicates an error during processing.",
+              "description": "Internal Server Error. Indicates an error during processing.",
               "content": {
                 "application/json": {
                   "schema": {
                     "type": "object",
                     "properties": {
-                      "error": {
-                        "type": "string",
-                        "example": "Internal server error"
+                      "success": {
+                        "type": "boolean",
+                        "example": false
                       },
-                      "message":{
+                      "message": {
                         "type": "string",
-                        "example": "Error detail message."
+                        "example": "Error message"
                       }
                     }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/v1/webhook": {
+        "post": {
+          "summary": "Webhook Handler",
+          "description": "Handle incoming webhooks for notifications and events.",
+          "security": [
+            {
+              "ApiKeyAuth": []
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Webhook processed successfully"
+            }
+          }
+        }
+      },
+      "/api/v1/logs": {
+        "get": {
+          "summary": "Get Webhook Logs",
+          "description": "Retrieve logs of webhook events.",
+          "security": [
+            {
+              "ApiKeyAuth": []
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Logs retrieved successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
                   }
                 }
               }
