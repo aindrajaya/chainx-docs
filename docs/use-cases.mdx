@@ -1,0 +1,567 @@
+---
+title: Use Cases & Examples
+description: Practical use cases and integration examples for ChainX Scanner
+slug: /use-cases
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Use Cases & Integration Examples
+
+Learn how to integrate ChainX Scanner into your workflow with real-world examples and practical implementations.
+
+## Development Team Integration
+
+### Scenario: Pre-deployment Security Checks
+
+Your team wants to scan all smart contracts before production deployment.
+
+<Tabs>
+  <TabItem value="github-actions" label="GitHub Actions CI/CD">
+    ```yaml
+    # .github/workflows/contract-scan.yml
+    name: Smart Contract Security Scan
+    
+    on:
+      pull_request:
+        paths:
+          - 'contracts/**/*.sol'
+      push:
+        branches: [main]
+        paths:
+          - 'contracts/**/*.sol'
+    
+    jobs:
+      scan:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v3
+          
+          - name: Scan Smart Contracts
+            run: |
+              API_KEY="${{ secrets.CHAINX_API_KEY }}"
+              CONTRACTS_DIR="./contracts"
+              
+              for contract in $CONTRACTS_DIR/*.sol; do
+                echo "Scanning $contract..."
+                curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+                  -H "X-API-Key: $API_KEY" \
+                  -F "file=@$contract" \
+                  -o "scan_result_$(basename $contract).json"
+                
+                # Check for critical vulnerabilities
+                if grep -q '"critical": [1-9]' "scan_result_$(basename $contract).json"; then
+                  echo "⚠️  Critical vulnerability found in $contract"
+                  exit 1
+                fi
+              done
+          
+          - name: Upload Scan Results
+            if: always()
+            uses: actions/upload-artifact@v3
+            with:
+              name: scan-results
+              path: scan_result_*.json
+    ```
+  </TabItem>
+  <TabItem value="nodejs-script" label="Node.js Script">
+    ```javascript
+    // scripts/scan-contracts.js
+    const fs = require('fs');
+    const path = require('path');
+    const FormData = require('form-data');
+    
+    const API_KEY = process.env.CHAINX_API_KEY;
+    const CONTRACTS_DIR = './contracts';
+    const API_URL = 'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan';
+    
+    async function scanContract(filePath) {
+      const form = new FormData();
+      form.append('file', fs.createReadStream(filePath));
+      
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'X-API-Key': API_KEY
+        },
+        body: form
+      });
+      
+      return response.json();
+    }
+    
+    async function scanAllContracts() {
+      const files = fs.readdirSync(CONTRACTS_DIR).filter(f => f.endsWith('.sol'));
+      const results = [];
+      
+      for (const file of files) {
+        const filePath = path.join(CONTRACTS_DIR, file);
+        console.log(`Scanning ${file}...`);
+        
+        try {
+          const result = await scanContract(filePath);
+          results.push({ file, ...result });
+          
+          // Check for critical issues
+          if (result.securityScore?.summary?.critical > 0) {
+            console.error(`❌ Critical vulnerabilities in ${file}`);
+            process.exit(1);
+          } else {
+            console.log(`✅ ${file} - Score: ${result.securityScore?.score}`);
+          }
+        } catch (error) {
+          console.error(`Error scanning ${file}:`, error);
+          process.exit(1);
+        }
+      }
+      
+      // Save results
+      fs.writeFileSync('scan-results.json', JSON.stringify(results, null, 2));
+      console.log('✅ All contracts scanned successfully');
+    }
+    
+    scanAllContracts();
+    ```
+  </TabItem>
+  <TabItem value="python-script" label="Python Script">
+    ```python
+    # scripts/scan_contracts.py
+    import os
+    import sys
+    import json
+    import glob
+    import requests
+    from pathlib import Path
+    
+    API_KEY = os.getenv('CHAINX_API_KEY')
+    CONTRACTS_DIR = './contracts'
+    API_URL = 'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan'
+    
+    def scan_contract(file_path):
+        """Scan a single smart contract"""
+        with open(file_path, 'rb') as f:
+            files = {'file': f}
+            headers = {'X-API-Key': API_KEY}
+            response = requests.post(API_URL, headers=headers, files=files)
+        
+        return response.json()
+    
+    def scan_all_contracts():
+        """Scan all .sol files in the contracts directory"""
+        contract_files = glob.glob(f'{CONTRACTS_DIR}/*.sol')
+        results = []
+        has_critical = False
+        
+        for file_path in contract_files:
+            file_name = Path(file_path).name
+            print(f'Scanning {file_name}...')
+            
+            try:
+                result = scan_contract(file_path)
+                results.append({'file': file_name, **result})
+                
+                # Check for critical vulnerabilities
+                if result.get('securityScore', {}).get('summary', {}).get('critical', 0) > 0:
+                    print(f'❌ Critical vulnerabilities in {file_name}')
+                    has_critical = True
+                else:
+                    score = result.get('securityScore', {}).get('score', 'N/A')
+                    print(f'✅ {file_name} - Score: {score}')
+            
+            except Exception as e:
+                print(f'Error scanning {file_name}: {e}')
+                sys.exit(1)
+        
+        # Save results
+        with open('scan-results.json', 'w') as f:
+            json.dump(results, f, indent=2)
+        
+        if has_critical:
+            print('❌ Critical vulnerabilities found')
+            sys.exit(1)
+        
+        print('✅ All contracts scanned successfully')
+    
+    if __name__ == '__main__':
+        scan_all_contracts()
+    ```
+  </TabItem>
+</Tabs>
+
+## Independent Security Auditor
+
+### Scenario: Batch Contract Auditing
+
+You audit multiple projects and need to generate reports for each.
+
+<Tabs>
+  <TabItem value="auditor-workflow" label="Auditor Workflow">
+    ```javascript
+    // auditor/batch-scanner.js
+    const fs = require('fs');
+    const path = require('path');
+    const FormData = require('form-data');
+    
+    class ContractAuditor {
+      constructor(apiKey) {
+        this.apiKey = apiKey;
+        this.apiUrl = 'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan';
+        this.results = [];
+      }
+      
+      async scanAndReport(contractPath, clientName, projectName) {
+        try {
+          console.log(`📋 Auditing ${projectName} for ${clientName}...`);
+          
+          const form = new FormData();
+          form.append('file', fs.createReadStream(contractPath));
+          
+          const response = await fetch(this.apiUrl, {
+            method: 'POST',
+            headers: { 'X-API-Key': this.apiKey },
+            body: form
+          });
+          
+          const result = await response.json();
+          
+          if (!result.success) {
+            throw new Error(result.error || 'Scan failed');
+          }
+          
+          const audit = this.generateAuditReport({
+            client: clientName,
+            project: projectName,
+            contract: path.basename(contractPath),
+            scanResult: result
+          });
+          
+          this.results.push(audit);
+          return audit;
+        } catch (error) {
+          console.error(`❌ Error auditing ${projectName}:`, error);
+          throw error;
+        }
+      }
+      
+      generateAuditReport(data) {
+        const { client, project, contract, scanResult } = data;
+        const { securityScore, vulnerabilitiesCount, bestPractices } = scanResult;
+        
+        return {
+          client,
+          project,
+          contract,
+          timestamp: new Date().toISOString(),
+          securityScore,
+          vulnerabilities: {
+            total: vulnerabilitiesCount,
+            summary: securityScore.summary,
+            recommendation: this.getRiskRecommendation(securityScore.rating)
+          },
+          bestPractices,
+          status: vulnerabilitiesCount === 0 ? 'APPROVED' : 'REVIEW_REQUIRED'
+        };
+      }
+      
+      getRiskRecommendation(rating) {
+        const recommendations = {
+          'Excellent': 'Safe to deploy to production',
+          'Good': 'Can deploy with minor improvements',
+          'Fair': 'Address medium issues before deployment',
+          'Poor': 'Significant review needed, do not deploy',
+          'Critical': 'DO NOT DEPLOY - Critical issues must be fixed'
+        };
+        return recommendations[rating] || 'Review required';
+      }
+      
+      generateHTMLReport(outputPath) {
+        const html = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Smart Contract Audit Report</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 20px; }
+              .audit { page-break-after: always; margin-bottom: 40px; border-bottom: 2px solid #ccc; }
+              .header { background: #f0f0f0; padding: 15px; border-radius: 5px; }
+              .critical { color: #d32f2f; font-weight: bold; }
+              .good { color: #388e3c; font-weight: bold; }
+              table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+              th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+              th { background: #f0f0f0; }
+            </style>
+          </head>
+          <body>
+            <h1>Smart Contract Audit Report</h1>
+            ${this.results.map(audit => `
+              <div class="audit">
+                <div class="header">
+                  <h2>${audit.client} - ${audit.project}</h2>
+                  <p><strong>Contract:</strong> ${audit.contract}</p>
+                  <p><strong>Date:</strong> ${new Date(audit.timestamp).toLocaleDateString()}</p>
+                </div>
+                
+                <h3>Security Assessment</h3>
+                <table>
+                  <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                  </tr>
+                  <tr>
+                    <td>Security Score</td>
+                    <td class="${audit.securityScore.rating === 'Good' || audit.securityScore.rating === 'Excellent' ? 'good' : 'critical'}">
+                      ${audit.securityScore.score}/100 (${audit.securityScore.rating})
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Total Vulnerabilities</td>
+                    <td>${audit.vulnerabilities.total}</td>
+                  </tr>
+                  <tr>
+                    <td>Critical</td>
+                    <td class="critical">${audit.vulnerabilities.summary.critical}</td>
+                  </tr>
+                  <tr>
+                    <td>High</td>
+                    <td>${audit.vulnerabilities.summary.high}</td>
+                  </tr>
+                  <tr>
+                    <td>Medium</td>
+                    <td>${audit.vulnerabilities.summary.medium}</td>
+                  </tr>
+                </table>
+                
+                <h3>Recommendation</h3>
+                <p><strong>${audit.vulnerabilities.recommendation}</strong></p>
+                
+                <h3>Status</h3>
+                <p><strong class="${audit.status === 'APPROVED' ? 'good' : 'critical'}">${audit.status}</strong></p>
+              </div>
+            `).join('')}
+          </body>
+          </html>
+        `;
+        
+        fs.writeFileSync(outputPath, html);
+        console.log(`✅ Report saved to ${outputPath}`);
+      }
+    }
+    
+    // Usage
+    async function auditMultipleProjects() {
+      const auditor = new ContractAuditor(process.env.CHAINX_API_KEY);
+      
+      const audits = [
+        { client: 'Acme Corp', project: 'TokenA', file: './tokens/TokenA.sol' },
+        { client: 'Acme Corp', project: 'TokenB', file: './tokens/TokenB.sol' },
+        { client: 'TechStartup', project: 'DEX', file: './dex/DEXProtocol.sol' }
+      ];
+      
+      for (const audit of audits) {
+        await auditor.scanAndReport(audit.file, audit.client, audit.project);
+      }
+      
+      auditor.generateHTMLReport('./audit-report.html');
+    }
+    
+    auditMultipleProjects();
+    ```
+  </TabItem>
+</Tabs>
+
+## CI/CD Pipeline Integration
+
+### Scenario: Automated Testing in GitLab CI
+
+Integrate ChainX into your GitLab CI/CD pipeline.
+
+```yaml
+# .gitlab-ci.yml
+stages:
+  - test
+  - security
+  - deploy
+
+contract_security_scan:
+  stage: security
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache curl
+  script:
+    - |
+      for contract in contracts/*.sol; do
+        echo "Scanning $contract..."
+        RESPONSE=$(curl -s -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+          -H "X-API-Key: $CHAINX_API_KEY" \
+          -F "file=@$contract")
+        
+        # Check for critical issues
+        CRITICAL=$(echo $RESPONSE | grep -o '"critical": [0-9]*' | grep -o '[0-9]*')
+        
+        if [ "$CRITICAL" -gt 0 ]; then
+          echo "❌ Critical vulnerabilities found in $contract"
+          exit 1
+        fi
+        
+        echo "✅ $contract passed security scan"
+      done
+  artifacts:
+    paths:
+      - scan-results/
+    expire_in: 30 days
+  only:
+    - merge_requests
+```
+
+## Webhook Monitoring
+
+### Scenario: Real-time Scan Results via Webhooks
+
+Set up webhooks to receive scan results in real-time.
+
+<Tabs>
+  <TabItem value="express-webhook" label="Express.js Webhook Handler">
+    ```javascript
+    // server/webhooks.js
+    const express = require('express');
+    const app = express();
+    
+    app.use(express.json());
+    
+    // Store webhook results
+    const scanResults = new Map();
+    
+    app.post('/webhook/scan-complete', (req, res) => {
+      const { scanId, status, securityScore, vulnerabilitiesCount } = req.body;
+      
+      // Store result
+      scanResults.set(scanId, {
+        status,
+        score: securityScore.score,
+        rating: securityScore.rating,
+        vulnerabilities: vulnerabilitiesCount,
+        timestamp: new Date()
+      });
+      
+      console.log(`✅ Scan ${scanId} completed with score ${securityScore.score}`);
+      
+      // Trigger notifications
+      if (securityScore.score < 60) {
+        sendSlackNotification({
+          channel: '#security-alerts',
+          text: `⚠️ Low security score for scan ${scanId}: ${securityScore.score}/100`
+        });
+      }
+      
+      res.json({ success: true, message: 'Webhook processed' });
+    });
+    
+    function sendSlackNotification(notification) {
+      // Send to Slack webhook
+      fetch(process.env.SLACK_WEBHOOK_URL, {
+        method: 'POST',
+        body: JSON.stringify(notification)
+      });
+    }
+    
+    app.get('/results/:scanId', (req, res) => {
+      const result = scanResults.get(req.params.scanId);
+      if (result) {
+        res.json(result);
+      } else {
+        res.status(404).json({ error: 'Scan not found' });
+      }
+    });
+    
+    app.listen(3000, () => {
+      console.log('Webhook server running on port 3000');
+    });
+    ```
+  </TabItem>
+</Tabs>
+
+## Reporting & Analytics
+
+### Scenario: Generate Monthly Security Reports
+
+Track vulnerability trends over time.
+
+```javascript
+// reporting/generate-monthly-report.js
+const fs = require('fs');
+const { format, subMonths } = require('date-fns');
+
+class SecurityReporter {
+  constructor(apiKey) {
+    this.apiKey = apiKey;
+    this.scans = [];
+  }
+  
+  async generateMonthlyReport() {
+    const startDate = subMonths(new Date(), 1);
+    const endDate = new Date();
+    
+    // Get all scans from the past month
+    const scans = await this.getScansInRange(startDate, endDate);
+    
+    const report = {
+      period: `${format(startDate, 'MMM yyyy')} - ${format(endDate, 'MMM yyyy')}`,
+      totalScans: scans.length,
+      averageScore: Math.round(
+        scans.reduce((sum, s) => sum + s.securityScore.score, 0) / scans.length
+      ),
+      vulnerabilitySummary: this.summarizeVulnerabilities(scans),
+      trends: this.analyzeTrends(scans),
+      recommendations: this.generateRecommendations(scans)
+    };
+    
+    this.saveReport(report);
+    return report;
+  }
+  
+  summarizeVulnerabilities(scans) {
+    return {
+      total: scans.reduce((sum, s) => sum + s.vulnerabilitiesCount, 0),
+      critical: scans.reduce((sum, s) => sum + s.securityScore.summary.critical, 0),
+      high: scans.reduce((sum, s) => sum + s.securityScore.summary.high, 0),
+      medium: scans.reduce((sum, s) => sum + s.securityScore.summary.medium, 0),
+      low: scans.reduce((sum, s) => sum + s.securityScore.summary.low, 0)
+    };
+  }
+  
+  analyzeTrends(scans) {
+    // Analyze score trends, vulnerability patterns, etc.
+    return {
+      scoreImprovement: 'Consistent improvement',
+      mostCommonVulnerability: 'SWC-107 (Reentrancy)',
+      fixedIssues: 5,
+      newIssues: 2
+    };
+  }
+  
+  generateRecommendations(scans) {
+    return [
+      'Implement comprehensive test suite',
+      'Use OpenZeppelin contracts',
+      'Schedule professional audit',
+      'Review access control patterns'
+    ];
+  }
+  
+  saveReport(report) {
+    fs.writeFileSync(
+      `report-${format(new Date(), 'yyyy-MM')}.json`,
+      JSON.stringify(report, null, 2)
+    );
+  }
+}
+```
+
+## Support & Questions
+
+For integration questions or issues:
+- 📧 Email: support@chainx.id
+- 💬 Discord: [Join Community](https://discord.gg/chainx)
+- 🐙 GitHub: [View Examples](https://github.com/chainx-scanner/examples)
+

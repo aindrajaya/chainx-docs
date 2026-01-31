@@ -1,0 +1,353 @@
+---
+title: Subscription Plans
+description: ChainX Scanner subscription tiers and quota management
+slug: /plans
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Subscription Plans
+
+ChainX Scanner offers flexible subscription plans to match any development need, from personal projects to enterprise-scale security scanning.
+
+## Plan Tiers
+
+### Free Plan
+Perfect for testing and small projects
+
+- **Price:** Free
+- **Scans/Day:** 5
+- **Max File Size:** 100 KB
+- **Max Contract Size:** 5 KB
+- **Features:**
+  - Basic vulnerability detection
+  - Security scoring
+  - SWC pattern detection (12+ patterns)
+  - Community support
+
+### Basic Plan
+Ideal for active development teams
+
+- **Price:** $9.99/month (billed monthly)
+- **Scans/Day:** 100
+- **Max File Size:** 1 MB
+- **Max Contract Size:** 50 KB
+- **Features:**
+  - Everything in Free
+  - Priority support
+  - API access with standard rate limits
+  - Scan history (30 days)
+  - Email notifications
+
+### Pro Plan
+For professional development and auditing
+
+- **Price:** $29.99/month (billed monthly)
+- **Scans/Day:** 1000
+- **Max File Size:** 5 MB
+- **Max Contract Size:** 500 KB
+- **Features:**
+  - Everything in Basic
+  - AI-powered analysis with OpenRouter
+  - Extended scan history (90 days)
+  - Webhook integration
+  - Custom rate limits (on request)
+  - Priority email & chat support
+  - API SLA
+
+## Check Your Current Plan
+
+View your subscription details, renewal date, and quota usage:
+
+<Tabs>
+  <TabItem value="curl" label="cURL" default>
+    ```bash
+    curl -X GET "https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/user-plan?userId=cluxyz123" \
+      -H "Content-Type: application/json"
+    ```
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+    ```javascript
+    async function getUserPlan(userId) {
+      const response = await fetch(
+        `https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/user-plan?userId=${userId}`
+      );
+      const data = await response.json();
+      
+      if (data.success) {
+        console.log('Plan:', data.data.plan);
+        console.log('Renews at:', data.data.renewsAt);
+        console.log('Quotas:', data.data.quotas);
+      }
+      return data;
+    }
+    
+    // Usage
+    getUserPlan('cluxyz123');
+    ```
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python
+    import requests
+    
+    def get_user_plan(user_id):
+        url = f'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/user-plan?userId={user_id}'
+        response = requests.get(url)
+        return response.json()
+    
+    # Usage
+    plan = get_user_plan('cluxyz123')
+    print(f"Plan: {plan['data']['plan']}")
+    print(f"Scans per day: {plan['data']['quotas']['scansPerDay']}")
+    print(f"Max file size: {plan['data']['quotas']['maxFileSize']} bytes")
+    ```
+  </TabItem>
+</Tabs>
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "plan": "basic",
+    "renewsAt": "2026-02-15T00:00:00Z",
+    "lemonSqueezySubscriptionId": "sub_123456",
+    "quotas": {
+      "scansPerDay": 100,
+      "maxFileSize": 1048576,
+      "maxContractSize": 51200
+    }
+  }
+}
+```
+
+## Quota Limits
+
+All plans have daily scan limits and file size restrictions:
+
+<div style={{overflowX: 'auto'}}>
+
+| Feature | Free | Basic | Pro |
+|---------|------|-------|-----|
+| **Monthly Cost** | $0 | $9.99 | $29.99 |
+| **Scans/Day** | 5 | 100 | 1000 |
+| **Max File Size** | 100 KB | 1 MB | 5 MB |
+| **Max Contract Size** | 5 KB | 50 KB | 500 KB |
+| **API Rate Limit** | 60 req/hr | 600 req/hr | 6000 req/hr |
+| **Scan History** | 7 days | 30 days | 90 days |
+| **Support** | Community | Email | Email + Chat |
+| **AI Analysis** | ❌ | ❌ | ✅ |
+| **Webhooks** | ❌ | ❌ | ✅ |
+| **API SLA** | ❌ | ❌ | ✅ |
+
+</div>
+
+## Understanding Quotas
+
+### Daily Scan Limit
+
+Your plan determines how many scans you can perform per day:
+
+```bash
+# Example: Free plan allows 5 scans per day
+# After 5 successful scans, further scans return 429 Too Many Requests
+
+curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+  -H "X-API-Key: prod-chainx-abc123..." \
+  -F "file=@contract.sol"
+
+# 6th scan fails with:
+# {
+#   "error": "Daily scan limit exceeded. Limit resets at 2026-02-01T00:00:00Z"
+# }
+```
+
+### File Size Limit
+
+Files exceeding your plan's limit will be rejected:
+
+```bash
+# Pro plan: 5 MB limit
+# File size: 6 MB → Error
+
+# Response:
+# {
+#   "error": "File size exceeds maximum limit of 5242880 bytes. Upload a smaller file."
+# }
+```
+
+### Contract Code Limit
+
+The actual smart contract code cannot exceed your plan's character limit:
+
+```solidity
+// Pro plan: 500 KB contract size limit
+// This contract is 600 KB → Error when uploaded
+```
+
+## Quota Reset
+
+- **Daily Limits:** Reset at 00:00 UTC each day
+- **Monthly Quotas:** Reset on renewal date
+- **Unused Scans:** Don't roll over to next period
+
+## Upgrade Your Plan
+
+Upgrade to a higher tier anytime:
+
+<Tabs>
+  <TabItem value="portal" label="Via Dashboard">
+    1. Log in to your ChainX account
+    2. Go to **Subscription Settings**
+    3. Click **Upgrade Plan**
+    4. Select your new plan
+    5. Complete payment via Lemon Squeezy
+  </TabItem>
+  <TabItem value="api" label="Via API">
+    ```bash
+    # Contact support to upgrade via API
+    # Or use your dashboard for immediate upgrades
+    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/upgrade-plan \
+      -H "X-API-Key: prod-chainx-abc123..." \
+      -H "Content-Type: application/json" \
+      -d '{
+        "newPlan": "pro"
+      }'
+    ```
+  </TabItem>
+</Tabs>
+
+## Subscription Management
+
+### Payment Methods
+
+We use **Lemon Squeezy** for billing:
+
+- Credit/Debit cards (Visa, Mastercard, Amex)
+- Secure payment processing
+- Automatic recurring billing
+- Easy invoice access
+
+### Cancel Your Subscription
+
+You can cancel anytime. Your plan remains active until the end of the billing cycle:
+
+1. Log in to your account
+2. Go to **Subscription Settings**
+3. Click **Cancel Subscription**
+4. Confirm cancellation
+
+Your free plan access continues after cancellation.
+
+### Billing Information
+
+- **Billing Cycle:** Monthly (renews on same day each month)
+- **Auto-Renewal:** Enabled by default
+- **Invoices:** Available in your account dashboard
+- **Refunds:** Per Lemon Squeezy's refund policy (typically 30 days)
+
+## Usage Monitoring
+
+### Check Remaining Scans
+
+<Tabs>
+  <TabItem value="nodejs" label="Node.js">
+    ```javascript
+    async function checkQuotaUsage(userId, apiKey) {
+      const response = await fetch(
+        `https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/user-plan?userId=${userId}`
+      );
+      const data = await response.json();
+      
+      const quotas = data.data.quotas;
+      console.log(`You have ${quotas.scansPerDay} scans available today`);
+      console.log(`Max file size: ${(quotas.maxFileSize / 1024 / 1024).toFixed(2)} MB`);
+      console.log(`Max contract size: ${(quotas.maxContractSize / 1024).toFixed(2)} KB`);
+    }
+    ```
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python
+    import requests
+    
+    def check_quota_usage(user_id):
+        url = f'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/user-plan?userId={user_id}'
+        response = requests.get(url)
+        data = response.json()
+        
+        quotas = data['data']['quotas']
+        print(f"Scans per day: {quotas['scansPerDay']}")
+        print(f"Max file size: {quotas['maxFileSize'] / 1024 / 1024:.2f} MB")
+        print(f"Max contract size: {quotas['maxContractSize'] / 1024:.2f} KB")
+    ```
+  </TabItem>
+</Tabs>
+
+## Enterprise Solutions
+
+For large-scale scanning or custom requirements:
+
+- **Higher scan limits:** Up to 10,000+ scans/day
+- **Dedicated support:** Direct support contact
+- **Custom SLAs:** 99.9% uptime guarantee
+- **Webhook priority:** Faster webhook deliveries
+- **Advanced analytics:** Detailed usage reports
+- **Custom contracts:** Flexible billing options
+
+**Contact:** enterprise@chainx.id
+
+## Plan Comparison Examples
+
+### Startup Development
+
+**Best for:** Early-stage startups, 1-3 developers
+
+- Use **Basic Plan**
+- 100 scans/day is sufficient for development
+- Easy to upgrade when needed
+
+### Medium Team
+
+**Best for:** Growing teams, 10+ developers, multiple projects
+
+- Use **Pro Plan**
+- 1000 scans/day covers active development
+- AI analysis for critical contracts
+- Webhook integration for CI/CD
+
+### Large Enterprise
+
+**Best for:** Production systems, 100+ developers, mission-critical contracts
+
+- Use **Enterprise Plan**
+- Custom higher limits
+- 24/7 dedicated support
+- Advanced security features
+
+## Pricing FAQ
+
+**Q: Do unused scans roll over?**
+A: No, scans don't roll over. They reset daily at 00:00 UTC.
+
+**Q: What happens when I exceed my limit?**
+A: Your requests receive a 429 error with your limit reset time.
+
+**Q: Can I upgrade mid-month?**
+A: Yes, upgrades are effective immediately. Billing is prorated.
+
+**Q: Is there a free trial for Pro?**
+A: Start with Free plan first. Pro features are available immediately upon upgrade.
+
+**Q: What if I need custom limits?**
+A: Contact our sales team for enterprise plans.
+
+## Support
+
+- **Free Plan:** Community support via Discord
+- **Basic Plan:** Email support (24-48 hour response)
+- **Pro Plan:** Email & chat support (4-hour response)
+- **Enterprise:** 24/7 dedicated support
+
+Need help? Contact: support@chainx.id
+

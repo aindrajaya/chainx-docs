@@ -1,52 +1,444 @@
 ---
-title: Troubleshooting
-description: Troubleshooting
+title: Troubleshooting & FAQ
+description: Common issues, error handling, and frequently asked questions for ChainX Scanner
 slug: "troubleshooting"
 ---
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import Admonition from '@theme/Admonition';
 
+# Troubleshooting & FAQ
 
-:::warning
-🚧 Cortex.cpp is currently under development. Our documentation outlines the intended behavior of Cortex, which may not yet be fully implemented in the codebase.
-:::
+## Common API Errors & Solutions
 
-## Model No Response
+### 400 Bad Request - No File Uploaded
 
-In this issue, the model and the engine load successfully, but when interacting with the model, the model either times out or does not respond. This issue may occur when Cortex is running with low or insufficient VRAM hardware.
-
-To resolve this issue:
-<Tabs>
-    <TabItem value="Windows" label="Windows">
-    1. `cortex stop` to stop the Cortex process and model if you have started a model before. 
-    2. To make sure the processes are terminated, open your **Task Manager**.
-    3. Search for any **Jan** or **Cortex** processes → **Terminate** the tasks.
-    4. Rerun `cortex`.
-    </TabItem>
-    <TabItem value="Mac" label="Mac">
-    1. `cortex stop` to stop the Cortex process and model if you have started a model before. 
-    2. To make sure the processes are terminated, open your **Activity Monitor**.
-    3. Search for any **Jan** or **Cortex** processes → **Terminate** the tasks.
-    4. Rerun `cortex`
-    </TabItem>
-</Tabs>
-
-## Axios Error
-```bash
-AxiosError: getaddrinfo ENOTFOUND api.github.com
+**Error:**
+```json
+{
+  "error": "No file uploaded."
+}
 ```
 
-This issue occurs for several reasons:
+**Causes:**
+- File parameter not included in request
+- Form data not properly formatted
+- File doesn't exist at specified path
 
-- Bad internet connection when Cortex trying to download the model or the engine data.
-- If you attempt to run a model with a specific engine that has not been initialized yet after installing Cortex.
+**Solutions:**
+```bash
+# ❌ Wrong - missing file parameter
+curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+  -H "X-API-Key: prod-chainx-abc123..."
 
-To resolve this issue:
+# ✅ Correct - include file parameter
+curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+  -H "X-API-Key: prod-chainx-abc123..." \
+  -F "file=@./contracts/Token.sol"
+```
 
-1. Ensure your internet connection is good, or restart your model.
-2.  Follow the command below to restart the Cortex process:
+---
+
+### 400 Bad Request - File Size Exceeds Limit
+
+**Error:**
+```json
+{
+  "error": "File size exceeds maximum limit of 1048576 bytes. Upload a smaller file."
+}
+```
+
+**Causes:**
+- File larger than plan's limit
+- Contract code exceeds character limit
+
+**Solutions:**
+
+<Tabs>
+  <TabItem value="check-size" label="Check File Size">
+    ```bash
+    # macOS/Linux
+    ls -lh contracts/Token.sol
+    du -h contracts/Token.sol
+    
+    # Windows (PowerShell)
+    (Get-Item contracts/Token.sol).Length
+    ```
+  </TabItem>
+  <TabItem value="upgrade" label="Upgrade Plan">
+    | Plan | Max File | Max Code |
+    |------|----------|----------|
+    | Free | 100 KB | 5 KB |
+    | Basic | 1 MB | 50 KB |
+    | Pro | 5 MB | 500 KB |
+    
+    Upgrade your plan to increase limits.
+  </TabItem>
+</Tabs>
+
+---
+
+### 401 Unauthorized - Missing API Key
+
+**Error:**
+```json
+{
+  "error": "API key is required. Please provide X-API-Key header."
+}
+```
+
+**Solutions:**
+```bash
+# ✅ Correct - include X-API-Key header
+curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+  -H "X-API-Key: prod-chainx-abc123..." \
+  -F "file=@contract.sol"
+```
+
+---
+
+### 403 Forbidden - Invalid or Expired API Key
+
+**Error:**
+```json
+{
+  "error": "Invalid or expired API key"
+}
+```
+
+**Solutions:**
+
+```bash
+# 1. Generate a new API key if needed
+curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/generate-api-key \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "cluxyz123",
+    "type": "PRODUCTION",
+    "name": "New API Key"
+  }'
+
+# 2. Use the new API key
+export CHAINX_API_KEY="new-api-key-value"
+```
+
+---
+
+### 429 Too Many Requests - Rate Limited
+
+**Error:**
+```json
+{
+  "error": "API rate limit exceeded"
+}
+```
+
+**Solutions:**
+
+<Tabs>
+  <TabItem value="check-quota" label="Check Your Quota">
+    ```bash
+    curl -X GET "https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/user-plan?userId=cluxyz123"
+    ```
+  </TabItem>
+  <TabItem value="retry" label="Implement Retry Logic">
+    ```javascript
+    // Exponential backoff
+    async function scanWithRetry(filePath, apiKey) {
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const response = await fetch('...', { ... });
+        if (response.status === 429) {
+          const delay = Math.pow(2, attempt) * 1000;
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+        return response.json();
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem value="upgrade" label="Upgrade Your Plan">
+    | Plan | Scans/Day |
+    |------|-----------|
+    | Free | 5 |
+    | Basic | 100 |
+    | Pro | 1000 |
+  </TabItem>
+</Tabs>
+
+---
+
+### 500 Internal Server Error
+
+**Causes:**
+- Server processing error
+- Malformed contract file
+- Backend unavailable
+
+**Solutions:**
+```bash
+# 1. Check API is up
+curl https://chainx-api-dev-70e077384a6e.herokuapp.com/api/hello
+
+# 2. Verify contract is valid Solidity
+solc --parse contract.sol
+
+# 3. Retry with backoff
+# Wait 5-10 seconds, then retry
+```
+
+---
+
+## Registration & Account Issues
+
+### Email Verification
+
+**Problem:** Not receiving OTP email
+
+**Solutions:**
+```bash
+# Check spam folder first, then resend OTP
+curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/resend-otp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "your@email.com"
+  }'
+```
+
+---
+
+### Cannot Login - Email Not Verified
+
+**Solutions:**
+```bash
+# Verify email first
+curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/verify-email \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "your@email.com",
+    "otp": "12345678"
+  }'
+
+# Then login
+curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "your@email.com",
+    "password": "yourPassword123"
+  }'
+```
+
+---
+
+### Forgot Password
+
+```bash
+# Request reset
+curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/forgot-password \
+  -H "Content-Type: application/json" \
+  -d '{"email": "your@email.com"}'
+
+# Reset with token from email
+curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/reset-password \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "reset-token",
+    "newPassword": "newSecurePassword123"
+  }'
+```
+
+---
+
+## Scanning Issues
+
+### Scan Returns Empty Results
+
+**Causes:**
+- Contract is actually secure (no vulnerabilities)
+- File format issue
+
+**Solutions:**
+```bash
+# Verify contract has content
+wc -l contract.sol
+
+# Verify it's valid Solidity
+solc contract.sol
+```
+
+---
+
+### AI Scan Requires OpenRouter Key
+
+**Solutions:**
+```bash
+# 1. Get API key from https://openrouter.ai
+# 2. Include in request
+curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/ai-scan \
+  -H "X-API-Key: prod-chainx-abc123..." \
+  -F "file=@contract.sol" \
+  -F "openrouterApiKey=sk-or-v1-..." \
+  -F "model=google/gemini-2.0-pro-exp-02-05:free"
+```
+
+---
+
+## Frequently Asked Questions
+
+### Q: How long does a scan take?
+
+**A:** Most scans complete in 1-5 seconds. Large contracts (>1MB) may take longer. Pro plans have priority processing.
+
+---
+
+### Q: Will my contract code be stored?
+
+**A:** No, we process files in memory and don't permanently store contract code. Files are deleted immediately after scanning.
+
+---
+
+### Q: Can I scan private/internal contracts?
+
+**A:** Yes, you can scan contracts with any visibility level. We don't store or share code with anyone.
+
+---
+
+### Q: What languages are supported?
+
+**A:** Currently Solidity (.sol) files. Other languages coming soon.
+
+---
+
+### Q: Can I use API keys in CI/CD?
+
+**A:** Yes. Store API keys as secrets in your CI/CD system (GitHub Secrets, GitLab CI/CD Variables, etc.).
+
+---
+
+### Q: Do you support webhooks?
+
+**A:** Yes, webhooks are available on Pro plans.
+
+---
+
+### Q: Can I get historical scan data?
+
+**A:** Yes, retention varies by plan:
+- Free plan: 7 days
+- Basic plan: 30 days
+- Pro plan: 90 days
+
+---
+
+### Q: What's the difference between standard and AI scans?
+
+**Standard Scan:**
+- Detects known SWC patterns
+- Instant results (1-5 seconds)
+- Security scoring
+- Best for quick checks
+
+**AI Scan:**
+- Deep vulnerability analysis
+- Security recommendations
+- Detailed explanations
+- Slower but more comprehensive
+
+---
+
+### Q: Can I integrate with my monitoring system?
+
+**A:** Yes, use webhooks (Pro plan) or poll the API for results.
+
+---
+
+### Q: Do you provide professional audits?
+
+**A:** We provide automated scanning. For professional audits, contact enterprise@chainx.id
+
+---
+
+### Q: How often do you update vulnerability patterns?
+
+**A:** We update SWC pattern detection quarterly and continuously improve AI models.
+
+---
+
+### Q: What do I do if I can't remember my password?
+
+**A:** Use the forgot password flow:
+```bash
+curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/forgot-password \
+  -H "Content-Type: application/json" \
+  -d '{"email": "your@email.com"}'
+```
+
+A password reset link will be sent to your email.
+
+---
+
+### Q: Can I have multiple API keys?
+
+**A:** Yes, you can generate multiple API keys for different environments (production, testing, development).
+
+---
+
+### Q: Are there any rate limits I should know about?
+
+**A:** Yes, rate limits vary by plan:
+- Free: 60 requests/hour, 5 scans/day
+- Basic: 600 requests/hour, 100 scans/day
+- Pro: 6000 requests/hour, 1000 scans/day
+
+---
+
+### Q: How do I know if I've reached my daily scan limit?
+
+**A:** You'll receive a 429 error with a message indicating when your limit resets (typically at 00:00 UTC).
+
+---
+
+### Q: Can I upgrade or downgrade my plan anytime?
+
+**A:** Yes, you can change your plan anytime from your account dashboard. Changes take effect immediately.
+
+---
+
+## Getting Help
+
+### Support Channels
+
+| Plan | Email | Chat | Community |
+|------|-------|------|-----------|
+| Free | ❌ | ❌ | Discord ✅ |
+| Basic | ✅ | ❌ | Discord ✅ |
+| Pro | ✅ | ✅ | Discord ✅ |
+| Enterprise | ✅ | ✅ | Discord ✅ |
+
+### Contact Us
+
+- **Email Support:** support@chainx.id
+- **Discord Community:** [Join Here](https://discord.gg/chainx)
+- **GitHub Issues:** [Report Bug](https://github.com/chainx-scanner/api/issues)
+- **Enterprise Support:** enterprise@chainx.id
+
+### Provide Good Bug Reports
+
+When reporting issues, include:
+1. Your plan type
+2. API key (last 4 chars only)
+3. Contract size or error message
+4. Full HTTP response
+5. Steps to reproduce
+
+---
+
+## Still Need Help?
+
+- **Documentation:** Check [Getting Started](/docs/getting-started) and [API Reference](/api-reference)
+- **Discord:** Get quick help from community and team
+- **Email:** Contact support@chainx.id with detailed information
+- **Status:** Check [api status page](https://status.chainx.id) for outages
 
 ```bash
 # Stop the Cortex process

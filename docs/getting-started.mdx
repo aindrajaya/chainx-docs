@@ -1,0 +1,293 @@
+---
+title: Getting Started
+description: Quick start guide for ChainX Scanner API
+slug: /getting-started
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Getting Started with ChainX Scanner API
+
+ChainX Scanner is a comprehensive smart contract vulnerability scanner with AI-powered analysis, security scoring, and subscription management. This guide will help you get up and running in minutes.
+
+## Prerequisites
+
+- A valid email address for registration
+- API access to the ChainX Scanner endpoints
+- A Solidity smart contract file (.sol) to scan
+
+## Step 1: Register Your Account
+
+Create a new ChainX account with email verification:
+
+<Tabs>
+  <TabItem value="curl" label="cURL" default>
+    ```bash
+    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/register \
+      -H "Content-Type: application/json" \
+      -d '{
+        "email": "developer@example.com",
+        "password": "securePassword123",
+        "name": "John Developer"
+      }'
+    ```
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+    ```javascript
+    const response = await fetch('https://chainx-api-dev-70e077384a6e.herokuapp.com/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: 'developer@example.com',
+        password: 'securePassword123',
+        name: 'John Developer'
+      })
+    });
+    const data = await response.json();
+    console.log(data); // { message: "...", userId: "...", verificationSent: true }
+    ```
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python
+    import requests
+    
+    url = 'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/register'
+    payload = {
+      'email': 'developer@example.com',
+      'password': 'securePassword123',
+      'name': 'John Developer'
+    }
+    response = requests.post(url, json=payload)
+    print(response.json())
+    ```
+  </TabItem>
+</Tabs>
+
+**Expected Response:**
+```json
+{
+  "message": "User registered successfully. Please verify your email.",
+  "userId": "cluxyz123",
+  "verificationSent": true
+}
+```
+
+## Step 2: Verify Your Email
+
+Check your inbox for the OTP and verify your email:
+
+<Tabs>
+  <TabItem value="curl" label="cURL" default>
+    ```bash
+    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/verify-email \
+      -H "Content-Type: application/json" \
+      -d '{
+        "email": "developer@example.com",
+        "otp": "12345678"
+      }'
+    ```
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+    ```javascript
+    const response = await fetch('https://chainx-api-dev-70e077384a6e.herokuapp.com/api/verify-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: 'developer@example.com',
+        otp: '12345678'
+      })
+    });
+    const data = await response.json();
+    console.log(data); // { success: true, message: "Email verified successfully" }
+    ```
+  </TabItem>
+</Tabs>
+
+## Step 3: Login to Your Account
+
+Now you can log in with your credentials:
+
+<Tabs>
+  <TabItem value="curl" label="cURL" default>
+    ```bash
+    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/login \
+      -H "Content-Type: application/json" \
+      -d '{
+        "email": "developer@example.com",
+        "password": "securePassword123"
+      }'
+    ```
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+    ```javascript
+    const response = await fetch('https://chainx-api-dev-70e077384a6e.herokuapp.com/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: 'developer@example.com',
+        password: 'securePassword123'
+      })
+    });
+    const data = await response.json();
+    const userId = data.userId;
+    console.log('Login successful!', userId);
+    ```
+  </TabItem>
+</Tabs>
+
+## Step 4: Generate an API Key
+
+Generate an API key to authenticate your scan requests:
+
+<Tabs>
+  <TabItem value="curl" label="cURL" default>
+    ```bash
+    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/generate-api-key \
+      -H "Content-Type: application/json" \
+      -d '{
+        "userId": "cluxyz123",
+        "type": "PRODUCTION",
+        "name": "My Production Key"
+      }'
+    ```
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+    ```javascript
+    const response = await fetch('https://chainx-api-dev-70e077384a6e.herokuapp.com/api/generate-api-key', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: 'cluxyz123',
+        type: 'PRODUCTION',
+        name: 'My Production Key'
+      })
+    });
+    const data = await response.json();
+    const apiKey = data.apiKey.keyValue; // prod-chainx-abc123...
+    console.log('API Key:', apiKey);
+    ```
+  </TabItem>
+</Tabs>
+
+**Expected Response:**
+```json
+{
+  "message": "API key generated successfully",
+  "apiKey": {
+    "id": "key_123",
+    "keyValue": "prod-chainx-abc123...",
+    "type": "PRODUCTION",
+    "expiresAt": "2027-01-31T00:00:00Z"
+  }
+}
+```
+
+:::tip
+Store your API key securely. Never share it or commit it to version control. Use environment variables to manage sensitive credentials.
+:::
+
+## Step 5: Scan Your First Smart Contract
+
+Now you're ready to scan! Use your API key to authenticate:
+
+<Tabs>
+  <TabItem value="curl" label="cURL" default>
+    ```bash
+    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+      -H "X-API-Key: prod-chainx-abc123..." \
+      -F "file=@/path/to/contract.sol"
+    ```
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+    ```javascript
+    const fs = require('fs');
+    const FormData = require('form-data');
+    
+    const form = new FormData();
+    form.append('file', fs.createReadStream('/path/to/contract.sol'));
+    
+    const response = await fetch('https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan', {
+      method: 'POST',
+      headers: {
+        'X-API-Key': 'prod-chainx-abc123...'
+      },
+      body: form
+    });
+    const data = await response.json();
+    console.log(data);
+    ```
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python
+    import requests
+    
+    url = 'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan'
+    headers = {'X-API-Key': 'prod-chainx-abc123...'}
+    
+    with open('/path/to/contract.sol', 'rb') as f:
+      files = {'file': f}
+      response = requests.post(url, headers=headers, files=files)
+    
+    print(response.json())
+    ```
+  </TabItem>
+</Tabs>
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "message": "File scanned successfully",
+  "scanId": "cluxyz123scan456",
+  "file": "/uploads/contract_123.sol",
+  "vulnerabilitiesCount": 3,
+  "securityScore": {
+    "score": 75,
+    "rating": "Good",
+    "summary": {
+      "total": 3,
+      "critical": 0,
+      "high": 2,
+      "medium": 1,
+      "low": 0
+    }
+  },
+  "bestPractices": {
+    "recommendations": [
+      "Use well-audited libraries like OpenZeppelin",
+      "Implement reentrancy guards for state-changing functions",
+      "Add comprehensive input validation"
+    ]
+  }
+}
+```
+
+## Check Your Subscription Plan
+
+Verify your current plan and quota limits:
+
+<Tabs>
+  <TabItem value="curl" label="cURL" default>
+    ```bash
+    curl -X GET "https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/user-plan?userId=cluxyz123" \
+      -H "Content-Type: application/json"
+    ```
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+    ```javascript
+    const response = await fetch('https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/user-plan?userId=cluxyz123');
+    const data = await response.json();
+    console.log(data.data); 
+    // { plan: 'free', quotas: { scansPerDay: 5, maxFileSize: 102400, maxContractSize: 5000 } }
+    ```
+  </TabItem>
+</Tabs>
+
+## What's Next?
+
+- [Scan Smart Contracts](/docs/scanning) - Learn about detailed scanning options
+- [AI-Powered Analysis](/docs/ai-analysis) - Use advanced AI analysis for deeper insights
+- [Subscription Plans](/docs/plans) - Understand quota limits for each plan
+- [API Reference](/api-reference) - Explore all available endpoints
+

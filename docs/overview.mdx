@@ -1,69 +1,244 @@
 ---
 title: Overview
-description: Cortex Overview.
+description: ChainX Scanner - Smart Contract Vulnerability Detection
 slug: /
 ---
 
-import OAICoverage from "@site/src/components/OAICoverage"
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 
 # ChainX Scanner API
 
-:::info
-**Real-world Use:**  This API can be integrated into development tools, CI/CD pipelines, or security analysis platforms to automate the process of identifying vulnerabilities in Solidity smart contracts. 
+A comprehensive smart contract vulnerability scanner with AI-powered analysis, security scoring, and subscription management.
 
-This API is currently under development. If you have any questions, please contact [arista.indrajaya@gmail.com](mailto:arista.indrajaya@gmail.com).
+:::info
+**Real-world Use:** This API can be integrated into development tools, CI/CD pipelines, or security analysis platforms to automate the process of identifying vulnerabilities in Solidity smart contracts. 
+
+For support and questions, contact [support@chainx.id](mailto:support@chainx.id) or visit our [Discord community](https://discord.gg/chainx).
 :::
 
-ChainX Scanner API is a service that allows developers to scan their Solidity smart contracts for potential vulnerabilities.
+## Key Features
 
-**Key Features:**
+- **12+ Vulnerability Patterns:** Detect Smart Contract Weakness Classification (SWC) patterns including reentrancy, integer overflow, and more
+- **Security Scoring:** Automatic security rating from 0-100 with detailed severity breakdown
+- **AI-Powered Analysis:** Advanced vulnerability analysis using OpenRouter AI models
+- **Fast & Reliable:** Instant scan results with global API infrastructure
+- **Flexible Plans:** Free tier for testing, plus Basic and Pro plans for production use
+- **Easy Integration:** Simple HTTP API with multiple language support
+- **Rate Limiting & Quotas:** Fair usage with daily scan limits per plan
+- **Webhook Support:** Real-time notifications when scans complete
 
-*   **Automated Vulnerability Detection:**  Upload your smart contract and the API will automatically identify potential security risks.
-*   **Fast and Efficient:** The API is designed to provide quick and efficient scanning, minimizing delays in your development process.
-*   **Easy Integration:**  Integrate the API into your existing workflows using simple HTTP requests.
-*   **Rate Limiting:**  Includes rate limiting to prevent abuse and ensure fair usage.
+## Quick Start
 
-## How to Use
+Get up and running in 3 minutes:
 
-1.  **Make a POST request to the `/scan` endpoint.**
-2.  **Include the smart contract file in the request body as `multipart/form-data`.**
+<Tabs>
+  <TabItem value="register" label="1. Register" default>
+    ```bash
+    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/register \
+      -H "Content-Type: application/json" \
+      -d '{
+        "email": "your@email.com",
+        "password": "securePassword123",
+        "name": "Your Name"
+      }'
+    ```
+  </TabItem>
+  <TabItem value="verify" label="2. Verify Email">
+    Check your email for OTP, then verify:
+    ```bash
+    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/verify-email \
+      -H "Content-Type: application/json" \
+      -d '{
+        "email": "your@email.com",
+        "otp": "12345678"
+      }'
+    ```
+  </TabItem>
+  <TabItem value="api-key" label="3. Get API Key">
+    Login and generate an API key:
+    ```bash
+    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/generate-api-key \
+      -H "Content-Type: application/json" \
+      -d '{
+        "userId": "your-user-id",
+        "type": "PRODUCTION",
+        "name": "My API Key"
+      }'
+    ```
+  </TabItem>
+  <TabItem value="scan" label="4. Scan Contract">
+    Upload and scan your contract:
+    ```bash
+    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+      -H "X-API-Key: your-api-key" \
+      -F "file=@contract.sol"
+    ```
+  </TabItem>
+</Tabs>
 
-**Example using `curl`:**
+## What Can You Do?
 
-```bash
-curl -X POST \
-  -F 'file=@path/to/your/contract.sol' \
-  http://localhost:3000/scan  # Replace with your actual API URL
+### Standard Vulnerability Scanning
+Detect 12+ known Smart Contract Weakness Classification (SWC) patterns in seconds:
+- Integer overflow/underflow (SWC-101)
+- Reentrancy attacks (SWC-107)
+- Unprotected functions (SWC-105, SWC-106)
+- Authorization issues (SWC-114, SWC-115)
+- And more...
 
+[Learn more about scanning →](/docs/scanning)
+
+### AI-Powered Analysis
+Get deep insights using advanced AI models via OpenRouter:
+- Detailed vulnerability explanations
+- Security best practices recommendations
+- Custom risk assessment
+- Comprehensive audit reports
+
+[Explore AI analysis →](/docs/scanning#ai-powered-smart-contract-analysis)
+
+### Subscription Plans
+Choose the plan that fits your needs:
+
+| Feature | Free | Basic | Pro |
+|---------|------|-------|-----|
+| Scans/Day | 5 | 100 | 1000 |
+| Max File Size | 100 KB | 1 MB | 5 MB |
+| AI Analysis | ❌ | ❌ | ✅ |
+| Support | Community | Email | Email + Chat |
+| Price | Free | $9.99/mo | $29.99/mo |
+
+[View all plans →](/docs/plans)
+
+## Integration Examples
+
+### GitHub Actions
+```yaml
+- name: Scan Contracts
+  run: |
+    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+      -H "X-API-Key: ${{ secrets.CHAINX_API_KEY }}" \
+      -F "file=@contracts/Token.sol"
+```
+
+### Node.js
+```javascript
+const response = await fetch('https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan', {
+  method: 'POST',
+  headers: { 'X-API-Key': apiKey },
+  body: formData
+});
+```
+
+### Python
+```python
+response = requests.post(
+  'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan',
+  headers={'X-API-Key': api_key},
+  files={'file': open('contract.sol', 'rb')}
+)
+```
+
+[View more examples →](/docs/use-cases)
+
+## Documentation
+
+- **[Getting Started](/docs/getting-started)** - Complete setup guide
+- **[Smart Contract Scanning](/docs/scanning)** - Detailed scanning documentation
+- **[Authentication](/docs/authentication)** - API key management
+- **[Subscription Plans](/docs/plans)** - Plan comparison and quotas
+- **[Use Cases](/docs/use-cases)** - Real-world integration examples
+- **[API Reference](/api-reference)** - Complete API documentation
+
+## Supported Vulnerabilities
+
+ChainX Scanner detects the following SWC (Smart Contract Weakness Classification) patterns:
+
+- **SWC-101** - Integer Overflow and Underflow
+- **SWC-103** - Floating Pragma
+- **SWC-104** - Unchecked Call Return Value
+- **SWC-105** - Unprotected Ether Withdrawal
+- **SWC-106** - Unprotected SELFDESTRUCT
+- **SWC-107** - Reentrancy
+- **SWC-112** - Delegatecall to Untrusted Callee
+- **SWC-113** - DoS with Failed Call
+- **SWC-114** - Tx.Origin Authentication
+- **SWC-115** - Authorization via tx.origin
+- **SWC-116** - Block Values as Time Proxies
+- **SWC-118** - Incorrect Constructor Name
+- **SWC-120** - Weak Sources of Randomness
+- **SWC-123** - Requirement Violation
+- **SWC-132** - Unexpected Gas Usage
+
+[Complete vulnerability reference →](/docs/scanning#detected-vulnerabilities)
 
 ## API Endpoints
-  - /scan (POST)
-    Description: Uploads and scans a smart contract file for vulnerabilities.
-    Request:
-    - file: The smart contract file (.sol) to be uploaded.
-    Response:
-    - 200 OK:
-      ```JSON
-      {
-        "success": "Smart contract scanned successfully",
-        "file": "/path/to/uploaded/file.sol",
-        "vulnerabilitiesCount": 2,
-        "dataVulnerabilities": [
-          { "vulnerabilityId": 1 },
-          { "vulnerabilityId": 2 }
-        ],
-        "message": "This API has Rate limiter, if you want to use more further please contact me at email: arista.indrajaya@gmail.com"
-      }
-      ```
-    - 400 Bad Request: Returned if no file is uploaded.
-    - 500 Internal Server Error: Returned if an error occurs during the scan.
 
-## Rate Limiting
-The API has a rate limiter in place to prevent abuse. If you exceed the rate limit, you will receive an error message.  For more usage, please contact arista.indrajaya@gmail.com.
+All requests require authentication via `X-API-Key` header (except registration/login endpoints).
 
-## Future Enhancements
-  - Detailed Vulnerability Reports: Provide more detailed information about each vulnerability, including its severity, description, and potential mitigation strategies.
-  - Support for Additional File Types: Expand support to include other smart contract file types beyond Solidity (e.g., Vyper).
-  - Integration with Development Tools: Develop plugins or integrations for popular development tools to streamline vulnerability scanning within common workflows.
+### Authentication
+- `POST /api/register` - Create account
+- `POST /api/verify-email` - Verify email with OTP
+- `POST /api/login` - Login to account
+- `POST /api/generate-api-key` - Generate API key
+
+### Scanning
+- `POST /api/v1/scan` - Scan smart contract
+- `POST /api/v1/ai-scan` - AI-powered analysis scan
+- `GET /api/v1/user-api-keys` - List your API keys
+- `GET /api/v1/user-plan` - Check subscription plan
+
+### Account Management
+- `POST /api/forgot-password` - Request password reset
+- `POST /api/reset-password` - Reset password
+- `POST /api/resend-otp` - Resend verification OTP
+
+[View complete API reference →](/api-reference)
+
+## Rate Limits & Quotas
+
+All plans include daily scan limits and file size restrictions:
+
+**Free Plan:** 5 scans/day, 100 KB max file  
+**Basic Plan:** 100 scans/day, 1 MB max file  
+**Pro Plan:** 1000 scans/day, 5 MB max file  
+
+[Learn about rate limiting →](/docs/authentication#rate-limiting)
+
+## Popular Use Cases
+
+### Development Teams
+Integrate security scanning into your CI/CD pipeline with GitHub Actions, GitLab CI, or Jenkins.
+
+### Security Auditors
+Batch scan multiple projects and generate professional audit reports with security scores and recommendations.
+
+### Smart Contract Platforms
+Provide security scanning as a platform feature for your users.
+
+### DevOps
+Automate pre-deployment security checks to catch vulnerabilities before production.
+
+[Explore more use cases →](/docs/use-cases)
+
+## Security & Privacy
+
+- **No Code Storage:** We don't store your contract code permanently
+- **Encrypted Transmission:** All data encrypted in transit with HTTPS/TLS
+- **API Key Security:** Industry-standard API key authentication
+- **Compliance:** GDPR compliant with transparent data handling
+
+## Support
+
+- **Documentation:** Complete guides and API reference
+- **Email Support:** support@chainx.id (Free, Basic, Pro plans)
+- **Community:** [Discord](https://discord.gg/chainx)
+- **Enterprise:** enterprise@chainx.id for custom solutions
+
+## Next Steps
+
+1. [Create a free account and verify your email](/docs/getting-started)
+2. [Generate your first API key](/docs/getting-started#step-4-generate-an-api-key)
+3. [Scan your first smart contract](/docs/getting-started#step-5-scan-your-first-smart-contract)
+4. [Explore advanced features](/docs/scanning#ai-powered-smart-contract-analysis)

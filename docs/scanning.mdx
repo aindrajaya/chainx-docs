@@ -1,0 +1,424 @@
+---
+title: Smart Contract Scanning
+description: Comprehensive guide to scanning smart contracts with ChainX Scanner
+slug: /scanning
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Smart Contract Scanning
+
+ChainX Scanner provides two powerful scanning methods: standard vulnerability detection and AI-powered analysis. Choose the method that best fits your security needs.
+
+## Standard Vulnerability Scan
+
+The standard scan detects 12+ known Smart Contract Weakness Classification (SWC) patterns and provides instant vulnerability detection with security scoring.
+
+### Basic Scan
+
+Scan a smart contract file for vulnerabilities:
+
+<Tabs>
+  <TabItem value="curl" label="cURL" default>
+    ```bash
+    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+      -H "X-API-Key: prod-chainx-abc123..." \
+      -F "file=@contracts/MyToken.sol"
+    ```
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+    ```javascript
+    async function scanContract(filePath, apiKey) {
+      const fs = require('fs');
+      const FormData = require('form-data');
+      
+      const form = new FormData();
+      form.append('file', fs.createReadStream(filePath));
+      
+      const response = await fetch('https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan', {
+        method: 'POST',
+        headers: {
+          'X-API-Key': apiKey
+        },
+        body: form
+      });
+      
+      return response.json();
+    }
+    
+    // Usage
+    const result = await scanContract('./contracts/Token.sol', 'prod-chainx-abc123...');
+    console.log(result);
+    ```
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python
+    import requests
+    
+    def scan_contract(file_path, api_key):
+        url = 'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan'
+        headers = {'X-API-Key': api_key}
+        
+        with open(file_path, 'rb') as f:
+            files = {'file': f}
+            response = requests.post(url, headers=headers, files=files)
+        
+        return response.json()
+    
+    # Usage
+    result = scan_contract('./contracts/Token.sol', 'prod-chainx-abc123...')
+    print(result)
+    ```
+  </TabItem>
+</Tabs>
+
+### Response Structure
+
+<Tabs>
+  <TabItem value="success" label="Success Response (200)">
+    ```json
+    {
+      "success": true,
+      "message": "File scanned successfully",
+      "scanId": "cluxyz123scan456",
+      "file": "/uploads/contract_123.sol",
+      "vulnerabilitiesCount": 3,
+      "dataVulnerabilities": [
+        { "vulnerabilityId": "SWC-103" },
+        { "vulnerabilityId": "SWC-107" },
+        { "vulnerabilityId": "SWC-115" }
+      ],
+      "securityScore": {
+        "score": 75,
+        "rating": "Good",
+        "summary": {
+          "total": 3,
+          "critical": 0,
+          "high": 2,
+          "medium": 1,
+          "low": 0
+        }
+      },
+      "bestPractices": {
+        "checklist": [
+          {
+            "category": "Access Control",
+            "items": [
+              "Implement proper authorization checks",
+              "Use OpenZeppelin AccessControl"
+            ]
+          },
+          {
+            "category": "Reentrancy Protection",
+            "items": [
+              "Use ReentrancyGuard for external calls",
+              "Follow checks-effects-interactions pattern"
+            ]
+          }
+        ],
+        "recommendations": [
+          "Use well-audited libraries like OpenZeppelin",
+          "Implement reentrancy guards for state-changing functions",
+          "Add comprehensive input validation",
+          "Consider a professional security audit"
+        ]
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem value="error" label="Error Responses">
+    ```json
+    // 400 - No file uploaded
+    {
+      "error": "No file uploaded."
+    }
+    
+    // 401 - Missing API key
+    {
+      "error": "API key is required. Please provide X-API-Key header."
+    }
+    
+    // 403 - Invalid API key
+    {
+      "error": "Invalid or expired API key"
+    }
+    
+    // 429 - Rate limit exceeded
+    {
+      "error": "API rate limit exceeded"
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+## Detected Vulnerabilities
+
+ChainX Scanner detects the following SWC (Smart Contract Weakness Classification) patterns:
+
+| SWC | Name | Severity | Description |
+|-----|------|----------|-------------|
+| SWC-101 | Integer Overflow and Underflow | Critical | Arithmetic operations without bounds checking |
+| SWC-103 | Floating Pragma | High | Using unconstrained pragma version |
+| SWC-104 | Unchecked Call Return Value | High | Ignoring return values from external calls |
+| SWC-105 | Unprotected Ether Withdrawal | Critical | Unrestricted fund withdrawal |
+| SWC-106 | Unprotected SELFDESTRUCT | Critical | Unprotected contract destruction |
+| SWC-107 | Reentrancy | Critical | Functions vulnerable to reentrancy attacks |
+| SWC-112 | Delegatecall to Untrusted Callee | Critical | Dangerous delegatecall usage |
+| SWC-113 | DoS with Failed Call | High | Denial of service via failed calls |
+| SWC-114 | Tx.Origin Authentication | High | Using tx.origin for authorization |
+| SWC-115 | Authorization via tx.origin | High | Incorrect authorization mechanism |
+| SWC-116 | Block Values as Time Proxies | Medium | Relying on block variables for timing |
+| SWC-118 | Incorrect Constructor Name | High | Outdated constructor syntax |
+| SWC-120 | Weak Sources of Randomness | High | Using predictable randomness sources |
+| SWC-123 | Requirement Violation | Medium | Missing validation checks |
+| SWC-132 | Unexpected Gas Usage | Medium | Gas estimation errors |
+
+## Security Score Calculation
+
+The security score ranges from 0-100 and is calculated as follows:
+
+- Start with: **100 points**
+- Deduct per vulnerability:
+  - **Critical**: -20 points each
+  - **High**: -10 points each
+  - **Medium**: -5 points each
+  - **Low**: -2 points each
+  - **Info**: -1 point each
+
+### Score Ratings
+
+| Score Range | Rating | Status |
+|-------------|--------|--------|
+| 90-100 | Excellent | Very secure |
+| 75-89 | Good | Generally secure with minor concerns |
+| 60-74 | Fair | Multiple vulnerabilities to address |
+| 40-59 | Poor | Significant security issues |
+| 0-39 | Critical | High-risk, do not deploy |
+
+## AI-Powered Smart Contract Analysis
+
+Get in-depth analysis of your smart contracts using advanced AI models via OpenRouter.
+
+### Prerequisites
+
+- A valid API key from ChainX Scanner
+- An OpenRouter API key (get one at [openrouter.ai](https://openrouter.ai))
+- An AI model selection (e.g., 'google/gemini-2.0-pro-exp-02-05:free')
+
+### AI Scan Request
+
+<Tabs>
+  <TabItem value="curl" label="cURL" default>
+    ```bash
+    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/ai-scan \
+      -H "X-API-Key: prod-chainx-abc123..." \
+      -F "file=@contracts/MyToken.sol" \
+      -F "openrouterApiKey=sk-or-v1-..." \
+      -F "model=google/gemini-2.0-pro-exp-02-05:free"
+    ```
+  </TabItem>
+  <TabItem value="javascript" label="JavaScript">
+    ```javascript
+    async function aiScanContract(filePath, apiKey, openrouterKey, model) {
+      const fs = require('fs');
+      const FormData = require('form-data');
+      
+      const form = new FormData();
+      form.append('file', fs.createReadStream(filePath));
+      form.append('openrouterApiKey', openrouterKey);
+      form.append('model', model);
+      
+      const response = await fetch('https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/ai-scan', {
+        method: 'POST',
+        headers: {
+          'X-API-Key': apiKey
+        },
+        body: form
+      });
+      
+      return response.json();
+    }
+    
+    // Usage
+    const result = await aiScanContract(
+      './contracts/Token.sol',
+      'prod-chainx-abc123...',
+      'sk-or-v1-...',
+      'google/gemini-2.0-pro-exp-02-05:free'
+    );
+    console.log(result);
+    ```
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python
+    import requests
+    
+    def ai_scan_contract(file_path, api_key, openrouter_key, model):
+        url = 'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/ai-scan'
+        headers = {'X-API-Key': api_key}
+        
+        with open(file_path, 'rb') as f:
+            files = {'file': f}
+            data = {
+                'openrouterApiKey': openrouter_key,
+                'model': model
+            }
+            response = requests.post(url, headers=headers, files=files, data=data)
+        
+        return response.json()
+    
+    # Usage
+    result = ai_scan_contract(
+        './contracts/Token.sol',
+        'prod-chainx-abc123...',
+        'sk-or-v1-...',
+        'google/gemini-2.0-pro-exp-02-05:free'
+    )
+    print(result)
+    ```
+  </TabItem>
+</Tabs>
+
+### AI Scan Response
+
+```json
+{
+  "success": true,
+  "message": "Analysis completed successfully.",
+  "timeTaken": "12873.76 milliseconds",
+  "results": {
+    "summary": "...",
+    "vulnerabilities": [],
+    "recommendations": []
+  },
+  "outputFile": "analysis_results_2025-03-04T03-42-57-890Z.md"
+}
+```
+
+## Practical Examples
+
+### Example 1: Token Contract with Overflow Risk
+
+<Tabs>
+  <TabItem value="contract" label="Vulnerable Contract">
+    ```solidity
+    // SPDX-License-Identifier: MIT
+    pragma solidity ^0.7.0;
+    
+    contract VulnerableToken {
+        mapping(address => uint) balances;
+        
+        function transfer(address to, uint amount) public {
+            // SWC-101: Integer Overflow
+            balances[msg.sender] -= amount;
+            balances[to] += amount;
+        }
+    }
+    ```
+  </TabItem>
+  <TabItem value="scan-result" label="Scan Result">
+    ```json
+    {
+      "success": true,
+      "vulnerabilitiesCount": 1,
+      "dataVulnerabilities": [
+        { "vulnerabilityId": "SWC-101" }
+      ],
+      "securityScore": {
+        "score": 80,
+        "rating": "Good",
+        "summary": {
+          "total": 1,
+          "critical": 0,
+          "high": 0,
+          "medium": 0,
+          "low": 1
+        }
+      }
+    }
+    ```
+  </TabItem>
+  <TabItem value="fix" label="Recommended Fix">
+    ```solidity
+    // SPDX-License-Identifier: MIT
+    pragma solidity ^0.8.0;
+    
+    import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+    
+    contract SecureToken is ERC20 {
+        constructor(string memory name, string memory symbol)
+            ERC20(name, symbol) {}
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+### Example 2: Reentrancy Vulnerability
+
+<Tabs>
+  <TabItem value="contract" label="Vulnerable Contract">
+    ```solidity
+    // SPDX-License-Identifier: MIT
+    pragma solidity ^0.8.0;
+    
+    contract VulnerableBank {
+        mapping(address => uint) balances;
+        
+        function withdraw(uint amount) public {
+            require(balances[msg.sender] >= amount);
+            
+            // SWC-107: Reentrancy vulnerability
+            (bool success, ) = msg.sender.call{value: amount}("");
+            require(success);
+            
+            balances[msg.sender] -= amount;
+        }
+    }
+    ```
+  </TabItem>
+  <TabItem value="fix" label="Recommended Fix">
+    ```solidity
+    // SPDX-License-Identifier: MIT
+    pragma solidity ^0.8.0;
+    
+    import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+    
+    contract SecureBank is ReentrancyGuard {
+        mapping(address => uint) balances;
+        
+        function withdraw(uint amount) public nonReentrant {
+            require(balances[msg.sender] >= amount);
+            
+            balances[msg.sender] -= amount;
+            
+            (bool success, ) = msg.sender.call{value: amount}("");
+            require(success);
+        }
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+## Best Practices
+
+1. **Always Verify API Keys**: Store API keys in environment variables, never hardcode them
+2. **Handle Rate Limits**: Implement exponential backoff for rate limit errors (429)
+3. **Validate File Size**: Ensure contracts are within plan limits before uploading
+4. **Review All Findings**: Security scores are indicators; review all reported issues
+5. **Use Multiple Tools**: Combine ChainX with formal verification and professional audits
+6. **Automate in CI/CD**: Integrate scanning into your deployment pipeline
+7. **Monitor Quotas**: Check your plan regularly to track scan usage
+
+## Quota Limits
+
+Different subscription plans have different limits:
+
+| Plan | Scans/Day | Max File Size | Max Contract Size |
+|------|-----------|---------------|-------------------|
+| Free | 5 | 100 KB | 5 KB |
+| Basic | 100 | 1 MB | 50 KB |
+| Pro | 1000 | 5 MB | 500 KB |
+
+See [Subscription Plans](/docs/plans) for more details.
+
