@@ -22,7 +22,7 @@ Scan a smart contract file for vulnerabilities:
 <Tabs>
   <TabItem value="curl" label="cURL" default>
     ```bash
-    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+    curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan \
       -H "X-API-Key: prod-chainx-abc123..." \
       -F "file=@contracts/MyToken.sol"
     ```
@@ -36,7 +36,7 @@ Scan a smart contract file for vulnerabilities:
       const form = new FormData();
       form.append('file', fs.createReadStream(filePath));
       
-      const response = await fetch('https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan', {
+      const response = await fetch('https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan', {
         method: 'POST',
         headers: {
           'X-API-Key': apiKey
@@ -57,7 +57,7 @@ Scan a smart contract file for vulnerabilities:
     import requests
     
     def scan_contract(file_path, api_key):
-        url = 'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan'
+        url = 'https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan'
         headers = {'X-API-Key': api_key}
         
         with open(file_path, 'rb') as f:
@@ -211,7 +211,7 @@ Get in-depth analysis of your smart contracts using advanced AI models via OpenR
 <Tabs>
   <TabItem value="curl" label="cURL" default>
     ```bash
-    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/ai-scan \
+    curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/ai-scan \
       -H "X-API-Key: prod-chainx-abc123..." \
       -F "file=@contracts/MyToken.sol" \
       -F "openrouterApiKey=sk-or-v1-..." \
@@ -229,7 +229,7 @@ Get in-depth analysis of your smart contracts using advanced AI models via OpenR
       form.append('openrouterApiKey', openrouterKey);
       form.append('model', model);
       
-      const response = await fetch('https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/ai-scan', {
+      const response = await fetch('https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/ai-scan', {
         method: 'POST',
         headers: {
           'X-API-Key': apiKey
@@ -255,7 +255,7 @@ Get in-depth analysis of your smart contracts using advanced AI models via OpenR
     import requests
     
     def ai_scan_contract(file_path, api_key, openrouter_key, model):
-        url = 'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/ai-scan'
+        url = 'https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/ai-scan'
         headers = {'X-API-Key': api_key}
         
         with open(file_path, 'rb') as f:

@@ -35,7 +35,7 @@ Get up and running in 3 minutes:
 <Tabs>
   <TabItem value="register" label="1. Register" default>
     ```bash
-    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/register \
+    curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/register \
       -H "Content-Type: application/json" \
       -d '{
         "email": "your@email.com",
@@ -47,7 +47,7 @@ Get up and running in 3 minutes:
   <TabItem value="verify" label="2. Verify Email">
     Check your email for OTP, then verify:
     ```bash
-    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/verify-email \
+    curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/verify-email \
       -H "Content-Type: application/json" \
       -d '{
         "email": "your@email.com",
@@ -58,7 +58,7 @@ Get up and running in 3 minutes:
   <TabItem value="api-key" label="3. Get API Key">
     Login and generate an API key:
     ```bash
-    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/generate-api-key \
+    curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/generate-api-key \
       -H "Content-Type: application/json" \
       -d '{
         "userId": "your-user-id",
@@ -70,7 +70,7 @@ Get up and running in 3 minutes:
   <TabItem value="scan" label="4. Scan Contract">
     Upload and scan your contract:
     ```bash
-    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+    curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan \
       -H "X-API-Key: your-api-key" \
       -F "file=@contract.sol"
     ```
@@ -117,14 +117,14 @@ Choose the plan that fits your needs:
 ```yaml
 - name: Scan Contracts
   run: |
-    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+    curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan \
       -H "X-API-Key: ${{ secrets.CHAINX_API_KEY }}" \
       -F "file=@contracts/Token.sol"
 ```
 
 ### Node.js
 ```javascript
-const response = await fetch('https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan', {
+const response = await fetch('https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan', {
   method: 'POST',
   headers: { 'X-API-Key': apiKey },
   body: formData
@@ -134,7 +134,7 @@ const response = await fetch('https://chainx-api-dev-70e077384a6e.herokuapp.com/
 ### Python
 ```python
 response = requests.post(
-  'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan',
+  'https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan',
   headers={'X-API-Key': api_key},
   files={'file': open('contract.sol', 'rb')}
 )

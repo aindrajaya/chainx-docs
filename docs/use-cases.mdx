@@ -45,7 +45,7 @@ Your team wants to scan all smart contracts before production deployment.
               
               for contract in $CONTRACTS_DIR/*.sol; do
                 echo "Scanning $contract..."
-                curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+                curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan \
                   -H "X-API-Key: $API_KEY" \
                   -F "file=@$contract" \
                   -o "scan_result_$(basename $contract).json"
@@ -74,7 +74,7 @@ Your team wants to scan all smart contracts before production deployment.
     
     const API_KEY = process.env.CHAINX_API_KEY;
     const CONTRACTS_DIR = './contracts';
-    const API_URL = 'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan';
+    const API_URL = 'https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan';
     
     async function scanContract(filePath) {
       const form = new FormData();
@@ -136,7 +136,7 @@ Your team wants to scan all smart contracts before production deployment.
     
     API_KEY = os.getenv('CHAINX_API_KEY')
     CONTRACTS_DIR = './contracts'
-    API_URL = 'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan'
+    API_URL = 'https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan'
     
     def scan_contract(file_path):
         """Scan a single smart contract"""
@@ -206,7 +206,7 @@ You audit multiple projects and need to generate reports for each.
     class ContractAuditor {
       constructor(apiKey) {
         this.apiKey = apiKey;
-        this.apiUrl = 'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan';
+        this.apiUrl = 'https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan';
         this.results = [];
       }
       
@@ -392,7 +392,7 @@ contract_security_scan:
     - |
       for contract in contracts/*.sol; do
         echo "Scanning $contract..."
-        RESPONSE=$(curl -s -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+        RESPONSE=$(curl -s -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan \
           -H "X-API-Key: $CHAINX_API_KEY" \
           -F "file=@$contract")
         

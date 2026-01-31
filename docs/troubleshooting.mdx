@@ -28,11 +28,11 @@ import TabItem from '@theme/TabItem';
 **Solutions:**
 ```bash
 # ❌ Wrong - missing file parameter
-curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan \
   -H "X-API-Key: prod-chainx-abc123..."
 
 # ✅ Correct - include file parameter
-curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan \
   -H "X-API-Key: prod-chainx-abc123..." \
   -F "file=@./contracts/Token.sol"
 ```
@@ -90,7 +90,7 @@ curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
 **Solutions:**
 ```bash
 # ✅ Correct - include X-API-Key header
-curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan \
   -H "X-API-Key: prod-chainx-abc123..." \
   -F "file=@contract.sol"
 ```
@@ -110,7 +110,7 @@ curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
 
 ```bash
 # 1. Generate a new API key if needed
-curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/generate-api-key \
+curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/generate-api-key \
   -H "Content-Type: application/json" \
   -d '{
     "userId": "cluxyz123",
@@ -138,7 +138,7 @@ export CHAINX_API_KEY="new-api-key-value"
 <Tabs>
   <TabItem value="check-quota" label="Check Your Quota">
     ```bash
-    curl -X GET "https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/user-plan?userId=cluxyz123"
+    curl -X GET "https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/user-plan?userId=cluxyz123"
     ```
   </TabItem>
   <TabItem value="retry" label="Implement Retry Logic">
@@ -178,7 +178,7 @@ export CHAINX_API_KEY="new-api-key-value"
 **Solutions:**
 ```bash
 # 1. Check API is up
-curl https://chainx-api-dev-70e077384a6e.herokuapp.com/api/hello
+curl https://chainx-api-a154bfdeaf7a.herokuapp.com/api/hello
 
 # 2. Verify contract is valid Solidity
 solc --parse contract.sol
@@ -198,7 +198,7 @@ solc --parse contract.sol
 **Solutions:**
 ```bash
 # Check spam folder first, then resend OTP
-curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/resend-otp \
+curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/resend-otp \
   -H "Content-Type: application/json" \
   -d '{
     "email": "your@email.com"
@@ -212,7 +212,7 @@ curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/resend-otp \
 **Solutions:**
 ```bash
 # Verify email first
-curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/verify-email \
+curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/verify-email \
   -H "Content-Type: application/json" \
   -d '{
     "email": "your@email.com",
@@ -220,7 +220,7 @@ curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/verify-email 
   }'
 
 # Then login
-curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/login \
+curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "your@email.com",
@@ -234,12 +234,12 @@ curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/login \
 
 ```bash
 # Request reset
-curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/forgot-password \
+curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/forgot-password \
   -H "Content-Type: application/json" \
   -d '{"email": "your@email.com"}'
 
 # Reset with token from email
-curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/reset-password \
+curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/reset-password \
   -H "Content-Type: application/json" \
   -d '{
     "token": "reset-token",
@@ -274,7 +274,7 @@ solc contract.sol
 ```bash
 # 1. Get API key from https://openrouter.ai
 # 2. Include in request
-curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/ai-scan \
+curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/ai-scan \
   -H "X-API-Key: prod-chainx-abc123..." \
   -F "file=@contract.sol" \
   -F "openrouterApiKey=sk-or-v1-..." \
@@ -368,7 +368,7 @@ curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/ai-scan \
 
 **A:** Use the forgot password flow:
 ```bash
-curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/forgot-password \
+curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/forgot-password \
   -H "Content-Type: application/json" \
   -d '{"email": "your@email.com"}'
 ```

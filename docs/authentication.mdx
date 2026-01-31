@@ -16,7 +16,7 @@ All API requests to ChainX Scanner require authentication via an API key. This g
 ChainX Scanner uses API key-based authentication. All protected endpoints require the `X-API-Key` header:
 
 ```bash
-curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan \
   -H "X-API-Key: prod-chainx-abc123..." \
   -F "file=@contract.sol"
 ```
@@ -37,7 +37,7 @@ Create an API key for your application:
 <Tabs>
   <TabItem value="curl" label="cURL" default>
     ```bash
-    curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/generate-api-key \
+    curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/generate-api-key \
       -H "Content-Type: application/json" \
       -d '{
         "userId": "cluxyz123",
@@ -49,7 +49,7 @@ Create an API key for your application:
   <TabItem value="javascript" label="JavaScript">
     ```javascript
     async function generateApiKey(userId, type, name) {
-      const response = await fetch('https://chainx-api-dev-70e077384a6e.herokuapp.com/api/generate-api-key', {
+      const response = await fetch('https://chainx-api-a154bfdeaf7a.herokuapp.com/api/generate-api-key', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -71,7 +71,7 @@ Create an API key for your application:
     import requests
     
     def generate_api_key(user_id, key_type, name):
-        url = 'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/generate-api-key'
+        url = 'https://chainx-api-a154bfdeaf7a.herokuapp.com/api/generate-api-key'
         payload = {
             'userId': user_id,
             'type': key_type,
@@ -107,14 +107,14 @@ List all API keys associated with your account:
 <Tabs>
   <TabItem value="curl" label="cURL" default>
     ```bash
-    curl -X GET "https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/user-api-keys?userId=cluxyz123" \
+    curl -X GET "https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/user-api-keys?userId=cluxyz123" \
       -H "Content-Type: application/json"
     ```
   </TabItem>
   <TabItem value="javascript" label="JavaScript">
     ```javascript
     async function getApiKeys(userId) {
-      const response = await fetch(`https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/user-api-keys?userId=${userId}`);
+      const response = await fetch(`https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/user-api-keys?userId=${userId}`);
       return response.json();
     }
     
@@ -128,7 +128,7 @@ List all API keys associated with your account:
     import requests
     
     def get_api_keys(user_id):
-        url = f'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/user-api-keys?userId={user_id}'
+        url = f'https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/user-api-keys?userId={user_id}'
         response = requests.get(url)
         return response.json()
     
@@ -227,7 +227,7 @@ Monitor API key usage patterns:
 ### 401 Unauthorized - Missing API Key
 
 ```bash
-curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan \
   -F "file=@contract.sol"
 ```
 
@@ -240,7 +240,7 @@ curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
 
 **Fix:** Include the `X-API-Key` header:
 ```bash
-curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan \
+curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan \
   -H "X-API-Key: prod-chainx-abc123..." \
   -F "file=@contract.sol"
 ```
@@ -297,7 +297,7 @@ Implement exponential backoff with jitter:
     async function scanWithRetry(filePath, apiKey, maxRetries = 3) {
       for (let attempt = 0; attempt < maxRetries; attempt++) {
         try {
-          const response = await fetch('https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan', {
+          const response = await fetch('https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan', {
             method: 'POST',
             headers: { 'X-API-Key': apiKey },
             body: formData
@@ -332,7 +332,7 @@ Implement exponential backoff with jitter:
                 with open(file_path, 'rb') as f:
                     files = {'file': f}
                     response = requests.post(
-                        'https://chainx-api-dev-70e077384a6e.herokuapp.com/api/v1/scan',
+                        'https://chainx-api-a154bfdeaf7a.herokuapp.com/api/v1/scan',
                         headers={'X-API-Key': api_key},
                         files=files
                     )
@@ -360,7 +360,7 @@ Implement exponential backoff with jitter:
 Request a password reset:
 
 ```bash
-curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/forgot-password \
+curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/forgot-password \
   -H "Content-Type: application/json" \
   -d '{
     "email": "developer@example.com"
@@ -370,7 +370,7 @@ curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/forgot-passwo
 Reset password with token:
 
 ```bash
-curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/reset-password \
+curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/reset-password \
   -H "Content-Type: application/json" \
   -d '{
     "token": "reset-token-from-email",
@@ -383,7 +383,7 @@ curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/reset-passwor
 If you didn't receive the verification OTP:
 
 ```bash
-curl -X POST https://chainx-api-dev-70e077384a6e.herokuapp.com/api/resend-otp \
+curl -X POST https://chainx-api-a154bfdeaf7a.herokuapp.com/api/resend-otp \
   -H "Content-Type: application/json" \
   -d '{
     "email": "developer@example.com"
