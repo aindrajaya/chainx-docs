@@ -7,7 +7,7 @@
     },
     "servers": [
       {
-        "url": "https://chainx-api-dev-70e077384a6e.herokuapp.com"
+        "url": "https://chainx-api-a154bfdeaf7a.herokuapp.com"
       }
     ],
     "paths": {
